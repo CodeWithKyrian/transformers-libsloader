@@ -1,0 +1,30 @@
+{
+  "name": "codewithkyrian/transformers-libraries-downloader",
+  "description": "Composer plugin to download all shared libraries necessary for TransformersPHP",
+  "type": "composer-plugin",
+  "require": {
+    "php": "^8.1",
+    "composer-plugin-api": "^1.1 || ^2.0"
+  },
+  "require-dev": {
+    "composer/composer": "~1.0 || ~2.0",
+    "symfony/var-dumper": "^6.0|^7.0"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Codewithkyrian\\TransformersLibrariesDownloader\\": "src/"
+    }
+  },
+  "extra": {
+    "class": "Codewithkyrian\\TransformersLibrariesDownloader\\Plugin"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Kyrian Obikwelu",
+      "email": "koshnawaza@gmail.com"
+    }
+  ]
+}
