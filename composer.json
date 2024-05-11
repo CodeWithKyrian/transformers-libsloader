@@ -19,7 +19,6 @@
   "extra": {
     "class": "Codewithkyrian\\TransformersLibrariesDownloader\\Plugin"
   },
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "authors": [
     {
