@@ -103,7 +103,7 @@ enum Libraries
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
-                'folder' => 'rindow-matlib-Linux-{{version}}',
+                'folder' => 'rindow-matlib-linux-{{version}}',
                 'lib' => 'librindowmatlib_openmp.so',
                 'header' => 'matlib.h'
             ],
