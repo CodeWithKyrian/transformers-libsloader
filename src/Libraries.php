@@ -137,37 +137,37 @@ enum Libraries
         'aarch64-linux' => [
             'archive_format' => 'tar.gz',
             'rindowmatlib.serial' => [
-                'folder' => 'rindow-matlib-Linux-{{version}}',
+                'folder' => 'rindow-matlib-linux-{{version}}',
                 'lib' => 'librindowmatlib_serial.so',
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
-                'folder' => 'rindow-matlib-Linux-{{version}}',
+                'folder' => 'rindow-matlib-linux-{{version}}',
                 'lib' => 'librindowmatlib_openmp.so',
                 'header' => 'matlib.h'
             ],
             'openblas.serial' => [
-                'folder' => 'openblas-linux-arm64-{{version}}',
+                'folder' => 'openblas-linux-aarch64-{{version}}',
                 'lib' => 'libopenblas_serial.so',
                 'header' => 'openblas.h'
             ],
             'openblas.openmp' => [
-                'folder' => 'openblas-linux-arm64-{{version}}',
+                'folder' => 'openblas-linux-aarch64-{{version}}',
                 'lib' => 'libopenblas_openmp.so',
                 'header' => 'openblas.h'
             ],
             'lapacke.serial' => [
-                'folder' => 'openblas-linux-arm64-{{version}}',
+                'folder' => 'openblas-linux-aarch64-{{version}}',
                 'lib' => 'liblapacke_serial.so',
                 'header' => 'lapacke.h'
             ],
             'lapacke.openmp' => [
-                'folder' => 'openblas-linux-arm64-{{version}}',
+                'folder' => 'openblas-linux-aarch64-{{version}}',
                 'lib' => 'liblapacke_openmp.so',
                 'header' => 'lapacke.h'
             ],
             'onnxruntime' => [
-                'folder' => 'onnxruntime-linux-arm64-{{version}}',
+                'folder' => 'onnxruntime-linux-aarch64-{{version}}',
                 'lib' => 'libonnxruntime.so',
                 'header' => 'onnxruntime.h'
             ],
@@ -176,12 +176,12 @@ enum Libraries
         'x64-windows' => [
             'archive_format' => 'zip',
             'rindowmatlib.serial' => [
-                'folder' => 'rindow-matlib-Windows-{{version}}',
+                'folder' => 'rindow-matlib-windows-{{version}}',
                 'lib' => 'rindowmatlib_serial.dll',
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
-                'folder' => 'rindow-matlib-Windows-{{version}}',
+                'folder' => 'rindow-matlib-windows-{{version}}',
                 'lib' => 'rindowmatlib_openmp.dll',
                 'header' => 'matlib.h'
             ],
