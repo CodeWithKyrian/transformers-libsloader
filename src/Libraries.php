@@ -20,12 +20,12 @@ enum Libraries
         'x86_64-darwin' => [
             'archive_format' => 'tar.gz',
             'rindowmatlib.serial' => [
-                'folder' => 'rindow-matlib-Darwin-{{version}}',
+                'folder' => 'rindow-matlib-darwin-x86_64-{{version}}',
                 'lib' => 'librindowmatlib_serial.dylib',
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
-                'folder' => 'rindow-matlib-Darwin-{{version}}',
+                'folder' => 'rindow-matlib-darwin-x86_64-{{version}}',
                 'lib' => 'librindowmatlib_openmp.dylib',
                 'header' => 'matlib.h'
             ],
@@ -59,12 +59,12 @@ enum Libraries
         'arm64-darwin' => [
             'archive_format' => 'tar.gz',
             'rindowmatlib.serial' => [
-                'folder' => 'rindow-matlib-Darwin-{{version}}',
+                'folder' => 'rindow-matlib-darwin-arm64-{{version}}',
                 'lib' => 'librindowmatlib_serial.dylib',
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
-                'folder' => 'rindow-matlib-Darwin-{{version}}',
+                'folder' => 'rindow-matlib-darwin-arm64-{{version}}',
                 'lib' => 'librindowmatlib_openmp.dylib',
                 'header' => 'matlib.h'
             ],
@@ -98,7 +98,7 @@ enum Libraries
         'x86_64-linux' => [
             'archive_format' => 'tar.gz',
             'rindowmatlib.serial' => [
-                'folder' => 'rindow-matlib-Linux-{{version}}',
+                'folder' => 'rindow-matlib-linux-{{version}}',
                 'lib' => 'librindowmatlib_serial.so',
                 'header' => 'matlib.h'
             ],
