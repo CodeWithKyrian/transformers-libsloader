@@ -15,7 +15,7 @@ enum Libraries
     case Lapacke_OpenMP;
     case OnnxRuntime;
 
-    private const BASE_URL = 'https://github.com/codewithkyrian/transformers-php/releases/download/{{version}}/';
+    private const BASE_URL = 'https://github.com/codewithkyrian/transformers-libraries-downloader/releases/download/{{version}}/';
     protected const LIBRARIES = [
         'x86_64-darwin' => [
             'archive_format' => 'tar.gz',
@@ -213,11 +213,11 @@ enum Libraries
         ],
     ];
 
-    public static function transformersVersion(string $libsDir): string
+    public static function downloaderVersion(string $libsDir): string
     {
         $versions = parse_ini_file(self::joinPaths($libsDir, 'VERSIONS'));
 
-        return $versions['TRANSFORMERS_PHP'];
+        return $versions['DOWNLOADER'];
     }
 
     public function version(string $libsDir): string
@@ -237,7 +237,7 @@ enum Libraries
 
     public static function baseUrl(string $libsDir): string
     {
-        return str_replace('{{version}}', self::transformersVersion($libsDir), self::BASE_URL);
+        return str_replace('{{version}}', self::downloaderVersion($libsDir), self::BASE_URL);
     }
 
     public static function platformKey(): string

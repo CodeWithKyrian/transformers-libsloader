@@ -81,8 +81,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $this->io->write("  - Downloading $name");
 
-        $downloadUrl = "https://github.com/CodeWithKyrian/openblas-builder/releases/download/1.0.0/rindow-matlib-Darwin-1.0.0.tar.gz";
-
         $this->downloader->copy($downloadUrl, $downloadPath);
 
         $this->io->write("  - Installing $name : Extracting archive");
