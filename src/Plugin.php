@@ -79,11 +79,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $downloadUrl = Libraries::joinPaths($baseUrl, "$name.$ext");
         $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php') . ".$ext";
 
-        $this->io->write("  - Downloading $name");
+        $this->io->write("  - Downloading <info>$name</info>");
 
         $this->downloader->copy($downloadUrl, $downloadPath);
 
-        $this->io->write("  - Installing $name : Extracting archive");
+        $this->io->write("  - Installing <info>$name</info> : Extracting archive");
 
         $archive = new \PharData($downloadPath);
 
