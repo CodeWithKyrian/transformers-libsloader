@@ -11,8 +11,6 @@ enum Libraries
     case OpenBlas_OpenMP;
     case RindowMatlib_Serial;
     case RindowMatlib_OpenMP;
-    case Lapacke_Serial;
-    case Lapacke_OpenMP;
     case OnnxRuntime;
 
     private const BASE_URL = 'https://github.com/codewithkyrian/transformers-libraries-downloader/releases/download/{{version}}/';
@@ -38,16 +36,6 @@ enum Libraries
                 'folder' => 'openblas-osx-x86_64-{{version}}',
                 'lib' => 'libopenblas_openmp.dylib',
                 'header' => 'openblas.h'
-            ],
-            'lapacke.serial' => [
-                'folder' => 'openblas-osx-x86_64-{{version}}',
-                'lib' => 'libopenblas_serial.dylib',
-                'header' => 'lapacke.h'
-            ],
-            'lapacke.openmp' => [
-                'folder' => 'openblas-osx-x86_64-{{version}}',
-                'lib' => 'libopenblas_openmp.dylib',
-                'header' => 'lapacke.h'
             ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-osx-x86_64-{{version}}',
@@ -78,16 +66,6 @@ enum Libraries
                 'lib' => 'libopenblas_openmp.dylib',
                 'header' => 'openblas.h'
             ],
-            'lapacke.serial' => [
-                'folder' => 'openblas-osx-arm64-{{version}}',
-                'lib' => 'libopenblas_serial.dylib',
-                'header' => 'lapacke.h'
-            ],
-            'lapacke.openmp' => [
-                'folder' => 'openblas-osx-arm64-{{version}}',
-                'lib' => 'libopenblas_openmp.dylib',
-                'header' => 'lapacke.h'
-            ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-osx-arm64-{{version}}',
                 'lib' => 'libonnxruntime.dylib',
@@ -116,16 +94,6 @@ enum Libraries
                 'folder' => 'openblas-linux-x86_64-{{version}}',
                 'lib' => 'libopenblas_openmp.so',
                 'header' => 'openblas.h'
-            ],
-            'lapacke.serial' => [
-                'folder' => 'openblas-linux-x86_64-{{version}}',
-                'lib' => 'liblapacke_serial.so',
-                'header' => 'lapacke.h'
-            ],
-            'lapacke.openmp' => [
-                'folder' => 'openblas-linux-x86_64-{{version}}',
-                'lib' => 'liblapacke_openmp.so',
-                'header' => 'lapacke.h'
             ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-linux-x86_64-{{version}}',
@@ -156,16 +124,6 @@ enum Libraries
                 'lib' => 'libopenblas_openmp.so',
                 'header' => 'openblas.h'
             ],
-            'lapacke.serial' => [
-                'folder' => 'openblas-linux-aarch64-{{version}}',
-                'lib' => 'liblapacke_serial.so',
-                'header' => 'lapacke.h'
-            ],
-            'lapacke.openmp' => [
-                'folder' => 'openblas-linux-aarch64-{{version}}',
-                'lib' => 'liblapacke_openmp.so',
-                'header' => 'lapacke.h'
-            ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-linux-aarch64-{{version}}',
                 'lib' => 'libonnxruntime.so',
@@ -195,16 +153,6 @@ enum Libraries
                 'lib' => 'openblas_openmp.dll',
                 'header' => 'openblas.h'
             ],
-            'lapacke.serial' => [
-                'folder' => 'openblas-windows-x64-{{version}}',
-                'lib' => 'lapacke_serial.dll',
-                'header' => 'lapacke.h'
-            ],
-            'lapacke.openmp' => [
-                'folder' => 'openblas-windows-x64-{{version}}',
-                'lib' => 'lapacke_openmp.dll',
-                'header' => 'lapacke.h'
-            ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-windows-x64-{{version}}',
                 'lib' => 'onnxruntime.dll',
@@ -226,9 +174,7 @@ enum Libraries
 
         return match ($this) {
             self::OpenBlas_Serial,
-            self::OpenBlas_OpenMP,
-            self::Lapacke_Serial,
-            self::Lapacke_OpenMP => $versions['OPENBLAS'],
+            self::OpenBlas_OpenMP, => $versions['OPENBLAS'],
             self::RindowMatlib_Serial,
             self::RindowMatlib_OpenMP => $versions['RINDOW_MATLIB'],
             self::OnnxRuntime => $versions['ONNXRUNTIME'],
@@ -261,8 +207,6 @@ enum Libraries
             self::OpenBlas_OpenMP => self::LIBRARIES[self::platformKey()]['openblas.openmp']['lib'],
             self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['lib'],
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['lib'],
-            self::Lapacke_Serial => self::LIBRARIES[self::platformKey()]['lapacke.serial']['lib'],
-            self::Lapacke_OpenMP => self::LIBRARIES[self::platformKey()]['lapacke.openmp']['lib'],
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['lib'],
         };
 
@@ -276,8 +220,6 @@ enum Libraries
             self::OpenBlas_OpenMP => self::LIBRARIES[self::platformKey()]['openblas.openmp']['header'],
             self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['header'],
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['header'],
-            self::Lapacke_Serial => self::LIBRARIES[self::platformKey()]['lapacke.serial']['header'],
-            self::Lapacke_OpenMP => self::LIBRARIES[self::platformKey()]['lapacke.openmp']['header'],
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['header'],
         };
 
@@ -286,13 +228,11 @@ enum Libraries
 
     public function folder(string $libsDir): string
     {
-        $folder =  match ($this) {
+        $folder = match ($this) {
             self::OpenBlas_Serial => self::LIBRARIES[self::platformKey()]['openblas.serial']['folder'],
             self::OpenBlas_OpenMP => self::LIBRARIES[self::platformKey()]['openblas.openmp']['folder'],
             self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['folder'],
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['folder'],
-            self::Lapacke_Serial => self::LIBRARIES[self::platformKey()]['lapacke.serial']['folder'],
-            self::Lapacke_OpenMP => self::LIBRARIES[self::platformKey()]['lapacke.openmp']['folder'],
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['folder'],
         };
 
