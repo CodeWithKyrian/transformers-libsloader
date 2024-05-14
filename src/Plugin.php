@@ -63,7 +63,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
         } catch (Exception $e) {
             $this->io->writeError($e->getMessage());
-            $this->io->writeError("Failed to download shared libraries for TransformersPHP. Please run `./vendor/bin/transformers-php install` manually to install the libraries.");
+            $this->io->writeError("Failed to download shared libraries for TransformersPHP. \nPlease run `./vendor/bin/transformers-php install` manually to install the libraries.");
         }
     }
 
