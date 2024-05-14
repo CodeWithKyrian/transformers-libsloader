@@ -76,7 +76,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $baseUrl = Libraries::baseUrl($this->libsDir);
         $ext = Libraries::ext();
 
-        $downloadUrl = Libraries::joinPaths($baseUrl, "$name.$ext");
+        $downloadUrl = "$baseUrl/$name.$ext";
         $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php') . ".$ext";
 
         $this->io->write("  - Downloading <info>$name</info>");

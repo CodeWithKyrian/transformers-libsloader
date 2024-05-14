@@ -13,7 +13,7 @@ enum Libraries
     case RindowMatlib_OpenMP;
     case OnnxRuntime;
 
-    private const BASE_URL = 'https://github.com/codewithkyrian/transformers-libraries-downloader/releases/download/{{version}}/';
+    private const BASE_URL = 'https://github.com/codewithkyrian/transformers-libraries-downloader/releases/download/{{version}}';
     protected const LIBRARIES = [
         'x86_64-darwin' => [
             'archive_format' => 'tar.gz',
@@ -145,12 +145,12 @@ enum Libraries
             ],
             'openblas.serial' => [
                 'folder' => 'openblas-windows-x64-{{version}}',
-                'bin' => 'openblas_serial.dll',
+                'bin' => 'libopenblas_serial.dll',
                 'header' => 'openblas.h'
             ],
             'openblas.openmp' => [
                 'folder' => 'openblas-windows-x64-{{version}}',
-                'bin' => 'openblas_openmp.dll',
+                'bin' => 'libopenblas_openmp.dll',
                 'header' => 'openblas.h'
             ],
             'onnxruntime' => [
