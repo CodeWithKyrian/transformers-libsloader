@@ -135,27 +135,27 @@ enum Libraries
             'archive_format' => 'zip',
             'rindowmatlib.serial' => [
                 'folder' => 'rindow-matlib-windows-{{version}}',
-                'lib' => 'rindowmatlib_serial.dll',
+                'bin' => 'rindowmatlib_serial.dll',
                 'header' => 'matlib.h'
             ],
             'rindowmatlib.openmp' => [
                 'folder' => 'rindow-matlib-windows-{{version}}',
-                'lib' => 'rindowmatlib_openmp.dll',
+                'bin' => 'rindowmatlib_openmp.dll',
                 'header' => 'matlib.h'
             ],
             'openblas.serial' => [
                 'folder' => 'openblas-windows-x64-{{version}}',
-                'lib' => 'openblas_serial.dll',
+                'bin' => 'openblas_serial.dll',
                 'header' => 'openblas.h'
             ],
             'openblas.openmp' => [
                 'folder' => 'openblas-windows-x64-{{version}}',
-                'lib' => 'openblas_openmp.dll',
+                'bin' => 'openblas_openmp.dll',
                 'header' => 'openblas.h'
             ],
             'onnxruntime' => [
                 'folder' => 'onnxruntime-windows-x64-{{version}}',
-                'lib' => 'onnxruntime.dll',
+                'bin' => 'onnxruntime.dll',
                 'header' => 'onnxruntime.h'
             ],
         ],
@@ -202,15 +202,21 @@ enum Libraries
 
     public function libFile(string $libsDir): string
     {
+        $subDir = PHP_OS_FAMILY === 'Windows' ? 'bin' : 'lib';
+
         $file = match ($this) {
-            self::OpenBlas_Serial => self::LIBRARIES[self::platformKey()]['openblas.serial']['lib'],
-            self::OpenBlas_OpenMP => self::LIBRARIES[self::platformKey()]['openblas.openmp']['lib'],
-            self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['lib'],
-            self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['lib'],
-            self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['lib'],
+            self::OpenBlas_Serial => self::LIBRARIES[self::platformKey()]['openblas.serial'][$subDir],
+
+            self::OpenBlas_OpenMP => self::LIBRARIES[self::platformKey()]['openblas.openmp'][$subDir],
+
+            self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial'][$subDir],
+
+            self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp'][$subDir],
+
+            self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime'][$subDir],
         };
 
-        return self::joinPaths($libsDir, $this->folder($libsDir), 'lib', $file);
+        return self::joinPaths($libsDir, $this->folder($libsDir), $subDir, $file);
     }
 
     public function headerFile(string $libsDir): string
