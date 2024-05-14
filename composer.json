@@ -1,5 +1,5 @@
 {
-  "name": "codewithkyrian/transformers-libraries-downloader",
+  "name": "codewithkyrian/transformers-libsloader",
   "description": "Composer plugin to download all shared libraries necessary for TransformersPHP",
   "type": "composer-plugin",
   "require": {
