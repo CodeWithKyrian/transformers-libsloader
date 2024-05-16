@@ -13,7 +13,7 @@ enum Libraries
     case RindowMatlib_OpenMP;
     case OnnxRuntime;
 
-    private const BASE_URL = 'https://github.com/codewithkyrian/transformers-libraries-downloader/releases/download/{{version}}';
+    private const BASE_URL = 'https://github.com/CodeWithKyrian/transformers-libsloader/releases/download/{{version}}';
     protected const LIBRARIES = [
         'x86_64-darwin' => [
             'archive_format' => 'tar.gz',
