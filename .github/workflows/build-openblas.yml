@@ -22,18 +22,63 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [linux, windows, macos]
-        openmp: [0, 1]
-        linux_target: [HASWELL, ARMV8]
-        macos_target: [VORTEX, NEHALEM]
+        platform: [ linux, windows, macos ]
+        openmp: [ 0, 1 ]
+        linux_target: [ HASWELL, ARMV8 ]
+        macos_target: [ VORTEX, NEHALEM ]
+        include:
+          - platform: linux
+            openmp: 0
+            linux_target: HASWELL
+            openmp_suffix: serial
+            target_suffix: x86_64
+          - platform: linux
+            openmp: 0
+            linux_target: ARMV8
+            openmp_suffix: serial
+            target_suffix: armv8
+          - platform: linux
+            openmp: 1
+            linux_target: HASWELL
+            openmp_suffix: openmp
+            target_suffix: x86_64
+          - platform: linux
+            openmp: 1
+            linux_target: ARMV8
+            openmp_suffix: openmp
+            target_suffix: armv8
+          - platform: macos
+            openmp: 0
+            macos_target: VORTEX
+            openmp_suffix: serial
+            target_suffix: arm64
+          - platform: macos
+            openmp: 0
+            macos_target: NEHALEM
+            openmp_suffix: serial
+            target_suffix: x86_64
+          - platform: macos
+            openmp: 1
+            macos_target: VORTEX
+            openmp_suffix: openmp
+            target_suffix: arm64
+          - platform: macos
+            openmp: 1
+            macos_target: NEHALEM
+            openmp_suffix: openmp
+            target_suffix: x86_64
+          - platform: windows
+            openmp: 0
+            openmp_suffix: serial
+            target_suffix: x86_64
+          - platform: windows
+            openmp: 1
+            openmp_suffix: openmp
+            target_suffix: x86_64
       fail-fast: false
       max-parallel: 3
 
     runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
-
-    env:
-      OPENMP_SUFFIX: ${{ matrix.openmp == 0 && 'serial' || 'openmp' }}
-      TARGET_SUFFIX: ${{ matrix.platform == 'linux' && matrix.linux_target == 'HASWELL' && 'x86_64' || matrix.platform == 'linux' && matrix.linux_target == 'ARMV8' && 'armv8' || matrix.platform == 'macos' && matrix.macos_target == 'VORTEX' && 'arm64' || matrix.platform == 'macos' && matrix.macos_target == 'NEHALEM' && 'x86_64' || matrix.platform == 'windows' && 'windows' }}
 
     steps:
       - name: Check if platform matches
@@ -77,7 +122,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.linux_target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
-          make PREFIX=$PWD/openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX} install
+          make PREFIX=$PWD/openblas-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }} install
 
       - name: Build OpenBLAS (macOS)
         if: matrix.platform == 'macos'
@@ -86,7 +131,7 @@ jobs:
           export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
           export CC="/opt/homebrew/opt/llvm/bin/clang"
           make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.macos_target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
-          make PREFIX=$PWD/openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX} install
+          make PREFIX=$PWD/openblas-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }} install
 
       - name: Build OpenBLAS (Windows)
         if: matrix.platform == 'windows'
@@ -99,15 +144,15 @@ jobs:
       - name: Compress to Tarball (Linux and macOS)
         if: matrix.platform != 'windows'
         run: |
-          tar -czvf openblas-${{ matrix.platform }}-${OPENMP_SUFFIX}-${TARGET_SUFFIX}.tar.gz openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX}
+          tar -czvf openblas-${{ matrix.platform }}-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix}}.tar.gz openblas-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }}
 
       - name: Compress to Tarball (Windows)
         if: matrix.platform == 'windows'
         run: |
-          tar -czvf openblas-windows-${OPENMP_SUFFIX}.tar.gz build/install
+          tar -czvf openblas-windows-${{ matrix.openmp_suffix }}.tar.gz build/install
 
       - name: Upload OpenBLAS
         uses: actions/upload-artifact@v4
         with:
-          name: openblas-${{ matrix.platform }}-${OPENMP_SUFFIX}-${TARGET_SUFFIX}-${{ github.event.inputs.version }}
+          name: openblas-${{ matrix.platform }}-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }}-${{ github.event.inputs.version }}
           path: ${{ github.workspace }}/*.tar.gz
