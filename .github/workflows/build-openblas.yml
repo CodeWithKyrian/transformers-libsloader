@@ -24,61 +24,69 @@ jobs:
       matrix:
         platform: [ linux, windows, macos ]
         openmp: [ 0, 1 ]
-        linux_target: [ HASWELL, ARMV8 ]
-        macos_target: [ VORTEX, NEHALEM ]
         include:
           - platform: linux
+            os: ubuntu-latest
             openmp: 0
             linux_target: HASWELL
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: linux
+            os: ubuntu-latest
             openmp: 0
             linux_target: ARMV8
             openmp_suffix: serial
             target_suffix: armv8
           - platform: linux
+            os: ubuntu-latest
             openmp: 1
             linux_target: HASWELL
             openmp_suffix: openmp
             target_suffix: x86_64
           - platform: linux
+            os: ubuntu-latest
             openmp: 1
             linux_target: ARMV8
             openmp_suffix: openmp
             target_suffix: armv8
           - platform: macos
+            os: macos-latest
             openmp: 0
             macos_target: VORTEX
             openmp_suffix: serial
             target_suffix: arm64
           - platform: macos
+            os: macos-latest
             openmp: 0
             macos_target: NEHALEM
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: macos
+            os: macos-latest
             openmp: 1
             macos_target: VORTEX
             openmp_suffix: openmp
             target_suffix: arm64
           - platform: macos
+            os: macos-latest
             openmp: 1
             macos_target: NEHALEM
             openmp_suffix: openmp
             target_suffix: x86_64
           - platform: windows
+            os: windows-latest
             openmp: 0
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: windows
+            os: windows-latest
             openmp: 1
             openmp_suffix: openmp
             target_suffix: x86_64
       fail-fast: false
       max-parallel: 3
 
-    runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check if platform matches
