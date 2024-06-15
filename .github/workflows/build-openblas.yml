@@ -28,59 +28,61 @@ jobs:
           - platform: linux
             os: ubuntu-latest
             openmp: 0
-            linux_target: HASWELL
+            target: HASWELL
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: linux
             os: ubuntu-latest
             openmp: 0
-            linux_target: ARMV8
+            target: ARMV8
             openmp_suffix: serial
             target_suffix: armv8
           - platform: linux
             os: ubuntu-latest
             openmp: 1
-            linux_target: HASWELL
+            target: HASWELL
             openmp_suffix: openmp
             target_suffix: x86_64
           - platform: linux
             os: ubuntu-latest
             openmp: 1
-            linux_target: ARMV8
+            target: ARMV8
             openmp_suffix: openmp
             target_suffix: armv8
           - platform: macos
             os: macos-latest
             openmp: 0
-            macos_target: VORTEX
+            target: VORTEX
             openmp_suffix: serial
             target_suffix: arm64
           - platform: macos
             os: macos-latest
             openmp: 0
-            macos_target: NEHALEM
+            target: NEHALEM
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: macos
             os: macos-latest
             openmp: 1
-            macos_target: VORTEX
+            target: VORTEX
             openmp_suffix: openmp
             target_suffix: arm64
           - platform: macos
             os: macos-latest
             openmp: 1
-            macos_target: NEHALEM
+            target: NEHALEM
             openmp_suffix: openmp
             target_suffix: x86_64
           - platform: windows
             os: windows-latest
             openmp: 0
+            target: DYNAMIC
             openmp_suffix: serial
             target_suffix: x86_64
           - platform: windows
             os: windows-latest
             openmp: 1
+            target: DYNAMIC
             openmp_suffix: openmp
             target_suffix: x86_64
       fail-fast: false
@@ -129,7 +131,7 @@ jobs:
       - name: Build OpenBLAS (Linux)
         if: matrix.platform == 'linux'
         run: |
-          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.linux_target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
+          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
           make PREFIX=$PWD/openblas-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }} install
 
       - name: Build OpenBLAS (macOS)
@@ -138,7 +140,7 @@ jobs:
           export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
           export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
           export CC="/opt/homebrew/opt/llvm/bin/clang"
-          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.macos_target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
+          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
           make PREFIX=$PWD/openblas-${{ matrix.openmp_suffix }}-${{ matrix.target_suffix }} install
 
       - name: Build OpenBLAS (Windows)
