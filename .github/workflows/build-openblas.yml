@@ -1,0 +1,114 @@
+name: Build OpenBLAS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'OpenBLAS Version to Build'
+        required: true
+        default: 'v0.3.27'
+      platform:
+        description: 'Platform to Build On'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - linux
+          - windows
+          - macos
+          - all
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [linux, windows, macos]
+        openmp: [0, 1]
+        linux_target: [HASWELL, ARMV8]
+        macos_target: [VORTEX, NEHALEM]
+      fail-fast: false
+      max-parallel: 3
+
+    runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
+
+    steps:
+      - name: Check if platform matches
+        if: |
+          (github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform)
+        run: exit 1
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: OpenMathLib/OpenBLAS
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Install Dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc gfortran libopenblas-dev liblapack-dev cmake
+
+      - name: Install Dependencies (macOS)
+        if: matrix.platform == 'macos'
+        run: |
+          brew reinstall gcc
+          brew install coreutils cmake ccache llvm
+
+      - name: Install Dependencies (Windows)
+        if: matrix.platform == 'windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          release: false
+          install: >-
+            base-devel
+            mingw-w64-ucrt-x86_64-cc
+            mingw-w64-ucrt-x86_64-fc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-ccache
+
+      - name: Build OpenBLAS (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          OPENMP_SUFFIX="${{ matrix.openmp == 0 && 'serial' || 'openmp' }}"
+          TARGET_SUFFIX="${{ matrix.linux_target == 'HASWELL' && 'x86_64' || 'armv8' }}"
+          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.linux_target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
+          make PREFIX=$PWD/openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX} install
+
+      - name: Build OpenBLAS (macOS)
+        if: matrix.platform == 'macos'
+        run: |
+          OPENMP_SUFFIX="${{ matrix.openmp == 0 && 'serial' || 'openmp' }}"
+          TARGET_SUFFIX="${{ matrix.macos_target == 'VORTEX' && 'arm64' || 'x86_64' }}"
+          export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+          export CC="/opt/homebrew/opt/llvm/bin/clang"
+          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.macos_target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
+          make PREFIX=$PWD/openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX} install
+
+      - name: Build OpenBLAS (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DDYNAMIC_ARCH=ON -DUSE_OPENMP=${{ matrix.openmp }} -DUSE_THREAD=ON -DNUM_THREADS=64 -DTARGET=CORE2 -DONLY_CBLAS=1 ..
+          cd build && cmake --build .
+          cmake --install . --config Release --prefix install
+
+      - name: Compress to Tarball (Linux and macOS)
+        if: matrix.platform != 'windows'
+        run: |
+          tar -czvf openblas-${{ matrix.platform }}-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}.tar.gz openblas-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}
+
+      - name: Compress to Tarball (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          tar -czvf openblas-windows-${{ OPENMP_SUFFIX }}.tar.gz build/install
+
+      - name: Upload OpenBLAS
+        uses: actions/upload-artifact@v4
+        with:
+          name: openblas-${{ matrix.platform }}-${{ steps.builder.outputs.OPENMP_SUFFIX }}-${{ steps.builder.outputs.TARGET_SUFFIX }}-${{ github.event.inputs.version }}
+          path: ${{ github.workspace }}/*.tar.gz
