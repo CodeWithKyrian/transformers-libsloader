@@ -99,7 +99,7 @@ jobs:
       - name: Compress to Tarball (Linux and macOS)
         if: matrix.platform != 'windows'
         run: |
-          tar -czvf openblas-${{ matrix.platform }}-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}.tar.gz openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX}
+          tar -czvf openblas-${{ matrix.platform }}-${OPENMP_SUFFIX}-${TARGET_SUFFIX}.tar.gz openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX}
 
       - name: Compress to Tarball (Windows)
         if: matrix.platform == 'windows'
