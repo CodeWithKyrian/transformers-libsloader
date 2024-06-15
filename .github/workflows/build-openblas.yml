@@ -22,8 +22,6 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ linux, windows, macos ]
-        openmp: [ 0, 1 ]
         include:
           - platform: linux
             os: ubuntu-latest
@@ -86,7 +84,7 @@ jobs:
             openmp_suffix: openmp
             target_suffix: x86_64
       fail-fast: false
-      max-parallel: 3
+#      max-parallel: 3
 
     runs-on: ${{ matrix.os }}
 
