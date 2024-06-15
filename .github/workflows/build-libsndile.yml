@@ -22,15 +22,99 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ linux, windows, macos ]
         include:
           - platform: linux
-            target_suffix: x86_64
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DBUILD_SHARED_LIBS=ON
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
           - platform: windows
-            target_suffix: x64
+            os: windows-latest
+            cmake-generator: 'Visual Studio 17 2022'
+            cmake-options: >-
+              -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
+              -DBUILD_SHARED_LIBS=ON
+              -DBUILD_REGTEST=OFF
+              -DBUILD_EXAMPLES=OFF
+              -DINSTALL_PKGCONFIG_MODULE=OFF
+              -DCMAKE_BUILD_TYPE=Release
+              -DVCPKG_TARGET_TRIPLET=x64-windows-static
+              -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
           - platform: macos
-            target_suffix: x86_64
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            cmake-generator: 'Unix Makefiles'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DBUILD_SHARED_LIBS=ON
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
       fail-fast: false
       max-parallel: 3
 
-    runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check if platform matches
+        if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
+        run: exit 1
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: libsndfile/libsndfile
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Install Dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get update -y && sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev libmp3lame-dev libmpg123-dev
+
+      - name: Install Dependencies (MacOS)
+        if: matrix.platform == 'macos'
+        run: |
+          brew install automake autogen speex mpg123
+
+      - name: Install Dependencies (Windows)
+        if: matrix.platform == 'windows'
+        env:
+          VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+        shell: 'bash'
+        run: >
+          `vcpkg fetch nuget | tail -n 1`
+          sources add
+          -source "https://nuget.pkg.github.com/libsndfile/index.json"
+          -storepasswordincleartext
+          -name "GitHub"
+          -username "evpobr"
+          -password "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Build Libsndfile
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+          VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}}
+          cmake --build . --config Release
+
+      - name: Compress to Tarball
+        id: compressor
+        run: |
+            tar -czvf libsndfile-${{ matrix.platform }}.tar.gz build
+
+      - name: Upload Libsndfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
+          path: ${{ github.workspace }}/*.tar.gz
+
