@@ -6,7 +6,7 @@ on:
       version:
         description: 'Libsndfile Version to Build'
         required: true
-        default: '1.0.31'
+        default: '1.2.2'
       platform:
         description: 'Platform to Build On'
         required: true
@@ -106,15 +106,12 @@ jobs:
           cd build
           cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}}
           cmake --build . --config Release
+          cpack -C Release
 
-      - name: Compress to Tarball
-        id: compressor
-        run: |
-            tar -czvf libsndfile-${{ matrix.platform }}.tar.gz build
 
       - name: Upload Libsndfile
         uses: actions/upload-artifact@v4
         with:
           name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
-          path: ${{ github.workspace }}/*.tar.gz
+          path: ${{ github.workspace }}/build/*.tar.gz
 
