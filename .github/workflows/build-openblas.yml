@@ -31,10 +31,13 @@ jobs:
 
     runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
 
+    env:
+      OPENMP_SUFFIX: ${{ matrix.openmp == 0 && 'serial' || 'openmp' }}
+      TARGET_SUFFIX: ${{ matrix.platform == 'linux' && matrix.linux_target == 'HASWELL' && 'x86_64' || matrix.platform == 'linux' && matrix.linux_target == 'ARMV8' && 'armv8' || matrix.platform == 'macos' && matrix.macos_target == 'VORTEX' && 'arm64' || matrix.platform == 'macos' && matrix.macos_target == 'NEHALEM' && 'x86_64' || matrix.platform == 'windows' && 'windows' }}
+
     steps:
       - name: Check if platform matches
-        if: |
-          (github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform)
+        if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
         run: exit 1
 
       - name: Checkout Repository
@@ -73,16 +76,12 @@ jobs:
       - name: Build OpenBLAS (Linux)
         if: matrix.platform == 'linux'
         run: |
-          OPENMP_SUFFIX="${{ matrix.openmp == 0 && 'serial' || 'openmp' }}"
-          TARGET_SUFFIX="${{ matrix.linux_target == 'HASWELL' && 'x86_64' || 'armv8' }}"
           make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.linux_target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
           make PREFIX=$PWD/openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX} install
 
       - name: Build OpenBLAS (macOS)
         if: matrix.platform == 'macos'
         run: |
-          OPENMP_SUFFIX="${{ matrix.openmp == 0 && 'serial' || 'openmp' }}"
-          TARGET_SUFFIX="${{ matrix.macos_target == 'VORTEX' && 'arm64' || 'x86_64' }}"
           export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
           export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
           export CC="/opt/homebrew/opt/llvm/bin/clang"
@@ -94,21 +93,21 @@ jobs:
         run: |
           mkdir build && cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DDYNAMIC_ARCH=ON -DUSE_OPENMP=${{ matrix.openmp }} -DUSE_THREAD=ON -DNUM_THREADS=64 -DTARGET=CORE2 -DONLY_CBLAS=1 ..
-          cd build && cmake --build .
+          cmake --build .
           cmake --install . --config Release --prefix install
 
       - name: Compress to Tarball (Linux and macOS)
         if: matrix.platform != 'windows'
         run: |
-          tar -czvf openblas-${{ matrix.platform }}-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}.tar.gz openblas-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}
+          tar -czvf openblas-${{ matrix.platform }}-${{ OPENMP_SUFFIX }}-${{ TARGET_SUFFIX }}.tar.gz openblas-${OPENMP_SUFFIX}-${TARGET_SUFFIX}
 
       - name: Compress to Tarball (Windows)
         if: matrix.platform == 'windows'
         run: |
-          tar -czvf openblas-windows-${{ OPENMP_SUFFIX }}.tar.gz build/install
+          tar -czvf openblas-windows-${OPENMP_SUFFIX}.tar.gz build/install
 
       - name: Upload OpenBLAS
         uses: actions/upload-artifact@v4
         with:
-          name: openblas-${{ matrix.platform }}-${{ steps.builder.outputs.OPENMP_SUFFIX }}-${{ steps.builder.outputs.TARGET_SUFFIX }}-${{ github.event.inputs.version }}
+          name: openblas-${{ matrix.platform }}-${OPENMP_SUFFIX}-${TARGET_SUFFIX}-${{ github.event.inputs.version }}
           path: ${{ github.workspace }}/*.tar.gz
