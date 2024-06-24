@@ -115,3 +115,10 @@ jobs:
           name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
           path: ${{ github.workspace }}/build/*.tar.gz
 
+      - name: Upload Libsndfile (Windows)
+        if: matrix.platform == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
+          path: ${{ github.workspace }}/build/*.zip
+
