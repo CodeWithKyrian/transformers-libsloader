@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Check if platform matches
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
-        run: exit 1
+        run: exit 0
 
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -120,5 +120,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
-          path: ${{ github.workspace }}/build/*.zip
+          path: ${{ github.workspace }}/build
 
