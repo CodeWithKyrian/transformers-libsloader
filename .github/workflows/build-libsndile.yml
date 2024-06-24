@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Check if platform matches
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
-        run: exit 0
+        run: exit 1
 
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
           cd build
           cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}}
           cmake --build . --config Release
-          cpack -C Release
+          cpack -C Release -G TGZ
 
 
       - name: Upload Libsndfile
@@ -114,11 +114,4 @@ jobs:
         with:
           name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
           path: ${{ github.workspace }}/build/*.tar.gz
-
-      - name: Upload Libsndfile (Windows)
-        if: matrix.platform == 'windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
-          path: ${{ github.workspace }}/build
 
