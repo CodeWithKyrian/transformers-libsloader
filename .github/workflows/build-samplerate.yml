@@ -60,11 +60,13 @@ jobs:
               run: |
                 vcpkg install libsndfile:x64-windows opus:x64-windows fftw3:x64-windows
 
+            - name: Create CMake Build Environment
+              run: cmake -E make_directory ${{runner.workspace}}/build
+
             - name: Build Samplerate
+              working-directory: ${{runner.workspace}}/build
               run: |
-                mkdir build
-                cd build
-                cmake .. -DCMAKE_BUILD_TYPE=Release  ${{ matrix.configure-options }}
+                cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release ${{matrix.configure-options}}
                 cmake --build . --config Release
                 cpack -C Release -G TGZ
 
