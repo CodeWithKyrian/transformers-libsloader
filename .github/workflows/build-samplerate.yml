@@ -6,7 +6,7 @@ on:
       version:
         description: 'Samplerate Version to Build'
         required: true
-        default: '0.1.9'
+        default: '0.2.2'
       platform:
         description: 'Platform to Build On'
         required: true
