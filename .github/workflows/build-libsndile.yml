@@ -112,6 +112,6 @@ jobs:
       - name: Upload Libsndfile
         uses: actions/upload-artifact@v4
         with:
-          name: libsndfile-${{ matrix.platform }}-${{ github.event.inputs.version }}
+          name: libsndfile-${{ github.event.inputs.version }}-${{ matrix.platform }}
           path: ${{ github.workspace }}/build/*.tar.gz
 
