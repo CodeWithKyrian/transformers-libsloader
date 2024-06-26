@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Codewithkyrian\TransformersLibrariesDownloader;
 
 enum Libraries
@@ -12,6 +11,9 @@ enum Libraries
     case RindowMatlib_Serial;
     case RindowMatlib_OpenMP;
     case OnnxRuntime;
+    case Sndfile;
+    case Samplerate;
+    case FastTransformersUtils;
 
     private const BASE_URL = 'https://github.com/CodeWithKyrian/transformers-libsloader/releases/download/{{version}}';
     protected const LIBRARIES = [
@@ -42,6 +44,21 @@ enum Libraries
                 'lib' => 'libonnxruntime.dylib',
                 'header' => 'onnxruntime.h'
             ],
+            'sndfile' => [
+                'folder' => 'libsndfile-darwin-{{version}}',
+                'lib' => 'libsndfile.dylib',
+                'header' => 'sndfile.h'
+            ],
+            'samplerate' => [
+                'folder' => 'libsamplerate-darwin-{{version}}',
+                'lib' => 'libsamplerate.dylib',
+                'header' => 'samplerate.h'
+            ],
+            'fast_transformers_utils' => [
+                'folder' => 'fast_transformers_utils-osx-{{version}}',
+                'lib' => 'libfast_transformers_utils.dylib',
+                'header' => 'fast_transformers_utils.h'
+            ]
         ],
 
         'arm64-darwin' => [
@@ -71,6 +88,21 @@ enum Libraries
                 'lib' => 'libonnxruntime.dylib',
                 'header' => 'onnxruntime.h'
             ],
+            'sndfile' => [
+                'folder' => 'libsndfile-darwin-{{version}}',
+                'lib' => 'libsndfile.dylib',
+                'header' => 'sndfile.h'
+            ],
+            'samplerate' => [
+                'folder' => 'libsamplerate-darwin-{{version}}',
+                'lib' => 'libsamplerate.dylib',
+                'header' => 'samplerate.h'
+            ],
+            'fast_transformers_utils' => [
+                'folder' => 'fast_transformers_utils-osx-{{version}}',
+                'lib' => 'libfast_transformers_utils.dylib',
+                'header' => 'fast_transformers_utils.h'
+            ]
         ],
 
         'x86_64-linux' => [
@@ -100,6 +132,21 @@ enum Libraries
                 'lib' => 'libonnxruntime.so',
                 'header' => 'onnxruntime.h'
             ],
+            'sndfile' => [
+                'folder' => 'libsndfile-linux-{{version}}',
+                'lib' => 'libsndfile.dylib',
+                'header' => 'sndfile.h'
+            ],
+            'samplerate' => [
+                'folder' => 'libsamplerate-linux-{{version}}',
+                'lib' => 'libsamplerate.dylib',
+                'header' => 'samplerate.h'
+            ],
+            'fast_transformers_utils' => [
+                'folder' => 'fast_transformers_utils-linux-{{version}}',
+                'lib' => 'libfast_transformers_utils.dylib',
+                'header' => 'fast_transformers_utils.h'
+            ]
         ],
 
         'aarch64-linux' => [
@@ -129,6 +176,21 @@ enum Libraries
                 'lib' => 'libonnxruntime.so',
                 'header' => 'onnxruntime.h'
             ],
+            'sndfile' => [
+                'folder' => 'libsndfile-linux-{{version}}',
+                'lib' => 'libsndfile.dylib',
+                'header' => 'sndfile.h'
+            ],
+            'samplerate' => [
+                'folder' => 'libsamplerate-linux-{{version}}',
+                'lib' => 'libsamplerate.dylib',
+                'header' => 'samplerate.h'
+            ],
+            'fast_transformers_utils' => [
+                'folder' => 'fast_transformers_utils-linux-{{version}}',
+                'lib' => 'libfast_transformers_utils.dylib',
+                'header' => 'fast_transformers_utils.h'
+            ]
         ],
 
         'x64-windows' => [
@@ -158,6 +220,21 @@ enum Libraries
                 'bin' => 'onnxruntime.dll',
                 'header' => 'onnxruntime.h'
             ],
+            'sndfile' => [
+                'folder' => 'libsndfile-win64-{{version}}',
+                'lib' => 'libsndfile.dylib',
+                'header' => 'sndfile.h'
+            ],
+            'samplerate' => [
+                'folder' => 'libsamplerate-win64-{{version}}',
+                'lib' => 'libsamplerate.dylib',
+                'header' => 'samplerate.h'
+            ],
+            'fast_transformers_utils' => [
+                'folder' => 'fast_transformers_utils-windows-{{version}}',
+                'lib' => 'libfast_transformers_utils.dylib',
+                'header' => 'fast_transformers_utils.h'
+            ]
         ],
     ];
 
@@ -178,6 +255,9 @@ enum Libraries
             self::RindowMatlib_Serial,
             self::RindowMatlib_OpenMP => $versions['RINDOW_MATLIB'],
             self::OnnxRuntime => $versions['ONNXRUNTIME'],
+            self::Sndfile => $versions['SNDFILE'],
+            self::Samplerate => $versions['SAMPLERATE'],
+            self::FastTransformersUtils => $versions['FAST_TRANSFORMERS_UTILS']
         };
     }
 
@@ -214,6 +294,12 @@ enum Libraries
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp'][$subDir],
 
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime'][$subDir],
+
+            self::Sndfile => self::LIBRARIES[self::platformKey()]['sndfile'][$subDir],
+
+            self::Samplerate => self::LIBRARIES[self::platformKey()]['samplerate'][$subDir],
+
+            self::FastTransformersUtils => self::LIBRARIES[self::platformKey()]['fast_transformers_utils'][$subDir],
         };
 
         return self::joinPaths($libsDir, $this->folder($libsDir), $subDir, $file);
@@ -227,6 +313,9 @@ enum Libraries
             self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['header'],
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['header'],
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['header'],
+            self::Sndfile => self::LIBRARIES[self::platformKey()]['sndfile']['header'],
+            self::Samplerate => self::LIBRARIES[self::platformKey()]['samplerate']['header'],
+            self::FastTransformersUtils => self::LIBRARIES[self::platformKey()]['fast_transformers_utils']['header'],
         };
 
         return self::joinPaths($libsDir, $this->folder($libsDir), 'include', $file);
@@ -240,6 +329,9 @@ enum Libraries
             self::RindowMatlib_Serial => self::LIBRARIES[self::platformKey()]['rindowmatlib.serial']['folder'],
             self::RindowMatlib_OpenMP => self::LIBRARIES[self::platformKey()]['rindowmatlib.openmp']['folder'],
             self::OnnxRuntime => self::LIBRARIES[self::platformKey()]['onnxruntime']['folder'],
+            self::Sndfile => self::LIBRARIES[self::platformKey()]['sndfile']['folder'],
+            self::Samplerate => self::LIBRARIES[self::platformKey()]['samplerate']['folder'],
+            self::FastTransformersUtils => self::LIBRARIES[self::platformKey()]['fast_transformers_utils']['folder'],
         };
 
         return str_replace('{{version}}', $this->version($libsDir), $folder);
