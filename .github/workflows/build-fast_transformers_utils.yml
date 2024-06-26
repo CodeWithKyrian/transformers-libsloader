@@ -44,21 +44,21 @@ jobs:
           repository: CodeWithKyrian/fast_transformers_utils
           ref: ${{ github.event.inputs.version }}
 
-      - name: Install Dependencies (Linux)
-        if: matrix.platform == 'linux'
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
-
-      - name: Install Dependencies (MacOS)
-        if: matrix.platform == 'macos'
-        run: |
-          brew install automake libtool libsndfile fftw
-
-      - name: Install Dependencies (Windows)
-        if: matrix.platform == 'windows'
-        run: |
-          choco install -y libsndfile opus fftw alsa
+#      - name: Install Dependencies (Linux)
+#        if: matrix.platform == 'linux'
+#        run: |
+#          sudo apt-get update -y
+#          sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
+#
+#      - name: Install Dependencies (MacOS)
+#        if: matrix.platform == 'macos'
+#        run: |
+#          brew install automake libtool libsndfile fftw
+#
+#      - name: Install Dependencies (Windows)
+#        if: matrix.platform == 'windows'
+#        run: |
+#          choco install -y libsndfile opus fftw alsa
 
       - name: Build Fast Transformers Utils
         run: |
