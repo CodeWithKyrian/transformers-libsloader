@@ -1,0 +1,75 @@
+name: Build Fast Transformers Utils
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Fast Transformers Utils Version to Build'
+        required: true
+        default: '1.0.0'
+      platform:
+        description: 'Platform to Build On'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - linux
+          - windows
+          - macos
+          - all
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-latest
+            configure-options: ''
+          - platform: windows
+            os: windows-latest
+            configure-options: -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+          - platform: macos
+            os: macos-latest
+            configure-options: ''
+      fail-fast: false
+      max-parallel: 3
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: CodeWithKyrian/fast_transformers_utils
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Install Dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
+
+      - name: Install Dependencies (MacOS)
+        if: matrix.platform == 'macos'
+        run: |
+          brew install automake libtool libsndfile fftw
+
+      - name: Install Dependencies (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          choco install -y libsndfile opus fftw alsa
+
+      - name: Build Fast Transformers Utils
+        run: |
+          mkdir build
+          cd build
+          cmake .. ${{matrix.configure-options}}
+          cmake --build . --config Release
+          cpack -C Release -G TGZ
+
+      - name: Upload Fast Transformers Utils
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast_transformers_utils-${{ github.event.inputs.version }}-${{ matrix.platform }}
+          path: ${{ github.workspace }}/build/*.tar.gz
