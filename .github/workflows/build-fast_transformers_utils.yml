@@ -57,5 +57,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libsamplerate-${{ github.event.inputs.version }}-${{ matrix.platform }}
+          name: fast_transformers_utils-${{ github.event.inputs.version }}-${{ matrix.platform }}
           path: ${{ runner.workspace }}/build/*.tar.gz
