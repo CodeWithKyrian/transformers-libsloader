@@ -44,32 +44,18 @@ jobs:
           repository: CodeWithKyrian/fast_transformers_utils
           ref: ${{ github.event.inputs.version }}
 
-#      - name: Install Dependencies (Linux)
-#        if: matrix.platform == 'linux'
-#        run: |
-#          sudo apt-get update -y
-#          sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
-#
-#      - name: Install Dependencies (MacOS)
-#        if: matrix.platform == 'macos'
-#        run: |
-#          brew install automake libtool libsndfile fftw
-#
-#      - name: Install Dependencies (Windows)
-#        if: matrix.platform == 'windows'
-#        run: |
-#          choco install -y libsndfile opus fftw alsa
+      - name: Create CMake Build Environment
+        run: cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Build Fast Transformers Utils
+        working-directory: ${{runner.workspace}}/build
         run: |
-          mkdir build
-          cd build
-          cmake .. ${{matrix.configure-options}}
+          cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release ${{matrix.configure-options}}
           cmake --build . --config Release
           cpack -C Release -G TGZ
 
-      - name: Upload Fast Transformers Utils
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fast_transformers_utils-${{ github.event.inputs.version }}-${{ matrix.platform }}
-          path: ${{ github.workspace }}/build/*.tar.gz
+          name: libsamplerate-${{ github.event.inputs.version }}-${{ matrix.platform }}
+          path: ${{ runner.workspace }}/build/*.tar.gz
