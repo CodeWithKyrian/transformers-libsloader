@@ -134,17 +134,17 @@ enum Libraries
             ],
             'sndfile' => [
                 'folder' => 'libsndfile-linux-{{version}}',
-                'lib' => 'libsndfile.dylib',
+                'lib' => 'libsndfile.so',
                 'header' => 'sndfile.h'
             ],
             'samplerate' => [
                 'folder' => 'libsamplerate-linux-{{version}}',
-                'lib' => 'libsamplerate.dylib',
+                'lib' => 'libsamplerate.so',
                 'header' => 'samplerate.h'
             ],
             'fast_transformers_utils' => [
                 'folder' => 'fast_transformers_utils-linux-{{version}}',
-                'lib' => 'libfast_transformers_utils.dylib',
+                'lib' => 'libfast_transformers_utils.so',
                 'header' => 'fast_transformers_utils.h'
             ]
         ],
