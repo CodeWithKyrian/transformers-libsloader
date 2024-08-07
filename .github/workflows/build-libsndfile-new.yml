@@ -38,7 +38,7 @@ jobs:
           if-no-files-found: error
 
   macos-arm64:
-    runs-on: macos-latest
+    runs-on: macos-12
     if: ${{ inputs.platform == 'macos' || inputs.platform == 'all' }}
 
     steps:
