@@ -17,13 +17,13 @@ OGG_LIBDIR="$(pwd)/libogg-$OGGVERSION/src/.libs"
 
 if [ "$1" = "arm64" ]; then
     echo "Cross compiling for Darwin arm64.."
-    export MACOSX_DEPLOYMENT_TARGET=12.0
-    BUILD_HOST="--host=aarch64-apple-darwin --target=arm64-apple-macos12"
-    EXTRA_CFLAGS="-arch arm64 -target arm64-apple-macos12"
+    export MACOSX_DEPLOYMENT_TARGET=11.0
+    BUILD_HOST="--host=aarch64-apple-darwin --target=arm64-apple-macos11"
+    EXTRA_CFLAGS="-arch arm64 -target arm64-apple-macos11"
     CMAKE_ARCHITECTURE="arm64"
 else
     echo "Building for Darwin $(uname -m).."
-    export MACOSX_DEPLOYMENT_TARGET=12
+    export MACOSX_DEPLOYMENT_TARGET=10.9
     BUILD_HOST=""
     EXTRA_CFLAGS=""
     CMAKE_ARCHITECTURE="x86_64"
