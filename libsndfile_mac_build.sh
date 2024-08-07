@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 OGGVERSION=1.3.5
 VORBISVERSION=1.3.7
