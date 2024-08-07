@@ -34,7 +34,7 @@ download_and_extract() {
     local tar_name=$2
 
     curl -LO $url
-    tar -xf $tar_name
+    tar zxvf $tar_name
 }
 
 build_library() {
