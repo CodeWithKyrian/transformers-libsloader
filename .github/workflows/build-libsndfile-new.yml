@@ -20,7 +20,7 @@ on:
 
 jobs:
   macos-intel:
-    runs-on: macos-12
+    runs-on: macos-13
     if: ${{ inputs.platform == 'macos' || inputs.platform == 'all' }}
 
     steps:
@@ -38,7 +38,7 @@ jobs:
           if-no-files-found: error
 
   macos-arm64:
-    runs-on: macos-12
+    runs-on: macos-14
     if: ${{ inputs.platform == 'macos' || inputs.platform == 'all' }}
 
     steps:

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 OGGVERSION=1.3.5
 VORBISVERSION=1.3.7
 FLACVERSION=1.4.3
@@ -5,11 +7,12 @@ OPUSVERSION=1.4
 MPG123VERSION=1.32.3
 LAMEVERSION=3.100
 SNDFILE_VERSION=1.2.2
-
 JOBS=8
 SNDFILENAME=libsndfile-$SNDFILE_VERSION
 OGG_INCDIR="$(pwd)/libogg-$OGGVERSION/include"
 OGG_LIBDIR="$(pwd)/libogg-$OGGVERSION/src/.libs"
+
+set -e
 
 if [ "$1" = "arm64" ]; then
     echo "Cross compiling for Darwin arm64.."
@@ -22,9 +25,7 @@ else
     BUILD_HOST=""
     EXTRA_CFLAGS=""
 fi
-
 # libogg
-
 curl -LO https://downloads.xiph.org/releases/ogg/libogg-$OGGVERSION.tar.gz
 tar zxvf libogg-$OGGVERSION.tar.gz
 cd libogg-$OGGVERSION
@@ -34,15 +35,17 @@ cd ..
 
 # libvorbis
 
+export OGG_CFLAGS="-I$OGG_INCDIR"
+export OGG_LIBS="-L$OGG_LIBDIR -logg"
+
 curl -LO https://downloads.xiph.org/releases/vorbis/libvorbis-$VORBISVERSION.tar.gz
 tar zxvf libvorbis-$VORBISVERSION.tar.gz
 cd libvorbis-$VORBISVERSION
+sed -e 's/ -force_cpusubtype_ALL / /' -i.orig configure
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --disable-shared --with-ogg-includes=$OGG_INCDIR --with-ogg-libraries=$OGG_LIBDIR
 make -j$JOBS
 cd ..
-
 # libFLAC
-
 curl -LO https://downloads.xiph.org/releases/flac/flac-$FLACVERSION.tar.xz
 unxz flac-$FLACVERSION.tar.xz
 tar zxvf flac-$FLACVERSION.tar
@@ -50,9 +53,7 @@ cd flac-$FLACVERSION
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared --with-ogg-includes=$OGG_INCDIR --with-ogg-libraries=$OGG_LIBDIR
 make -j$JOBS
 cd ..
-
 # libopus
-
 curl -LO https://downloads.xiph.org/releases/opus/opus-$OPUSVERSION.tar.gz
 tar zxvf opus-$OPUSVERSION.tar.gz
 cd opus-$OPUSVERSION
@@ -60,18 +61,14 @@ ln -sf include opus
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --disable-shared --enable-static
 make -j$JOBS
 cd ..
-
 # mpg123
-
 curl -LO https://sourceforge.net/projects/mpg123/files/mpg123/$MPG123VERSION/mpg123-$MPG123VERSION.tar.bz2
 tar zxvf mpg123-$MPG123VERSION.tar.bz2
 cd mpg123-$MPG123VERSION
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared
 make -j$JOBS
 cd ..
-
 # liblame
-
 curl -LO https://sourceforge.net/projects/lame/files/lame/$LAMEVERSION/lame-$LAMEVERSION.tar.gz
 tar zxvf lame-$LAMEVERSION.tar.gz
 cd lame-$LAMEVERSION
@@ -79,9 +76,7 @@ ln -sf include lame
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared
 make -j$JOBS
 cd ..
-
 # libsndfile
-
 export FLAC_INCLUDE="$(pwd)/flac-$FLACVERSION/include"
 export FLAC_LIBS="$(pwd)/flac-$FLACVERSION/src/libFLAC/.libs/libFLAC.a"
 export OGG_INCLUDE="$(pwd)/libogg-$OGGVERSION/include"
@@ -96,7 +91,6 @@ export MP3LAME_INCLUDE="$(pwd)/lame-$LAMEVERSION"
 export MP3LAME_LIBS="$(pwd)/lame-$LAMEVERSION/libmp3lame/.libs/libmp3lame.a"
 export MPG123_INCLUDE="$(pwd)/mpg123-$MPG123VERSION/src/libmpg123"
 export MPG123_LIBS="$(pwd)/mpg123-$MPG123VERSION/src/libmpg123/.libs/libmpg123.a"
-
 curl -LO https://github.com/libsndfile/libsndfile/releases/download/$SNDFILE_VERSION/libsndfile-$SNDFILE_VERSION.tar.xz
 tar jxvf libsndfile-$SNDFILE_VERSION.tar.xz
 cd $SNDFILENAME
@@ -107,7 +101,6 @@ cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DBUILD_SHARED_LIBS=ON -DENABLE_EXTERNAL_
 fi
 cmake --build . --parallel $JOBS
 cd ..
-
 if [ "$1" = "arm64" ]; then
 cp -H $SNDFILENAME/libsndfile.dylib libsndfile_arm64.dylib
 chmod -x libsndfile_arm64.dylib
