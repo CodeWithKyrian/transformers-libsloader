@@ -20,7 +20,7 @@ on:
 
 jobs:
   macos-intel:
-    runs-on: macos-11
+    runs-on: macos-12
     if: ${{ inputs.platform == 'macos' || inputs.platform == 'all' }}
 
     steps:
