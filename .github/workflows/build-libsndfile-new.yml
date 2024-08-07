@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compile library
-        run: ./mac_build.sh
+        run: ./libsndfile_mac_build.sh
 
       - uses: actions/upload-artifact@v4
         with:
@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compile library
-        run: ./mac_build.sh arm64
+        run: ./libsndfile_mac_build.sh arm64
 
       - uses: actions/upload-artifact@v4
         with:
