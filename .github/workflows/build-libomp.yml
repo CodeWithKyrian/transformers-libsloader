@@ -88,7 +88,7 @@ jobs:
       - name: Setup LLVM
         uses: ZhongRuoyu/setup-llvm@v0
         with:
-          llvm-version: '${{ github.event.inputs.version }}'
+          llvm-version: '18'
 
       - name: Install Dependencies (Linux)
         if: matrix.platform == 'linux'
