@@ -88,7 +88,13 @@ jobs:
       - name: Setup LLVM
         uses: ZhongRuoyu/setup-llvm@v0
         with:
-          llvm-version: 17
+          llvm-version: '${{ github.event.inputs.version }}'
+
+      - name: Install Dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get update -y && sudo apt install curl && sudo apt-get install libcurl4-openssl-dev
 
       - name: Download OpenMP release from LLVM
         run: |
