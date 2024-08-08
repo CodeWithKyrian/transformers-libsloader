@@ -88,7 +88,7 @@ jobs:
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v2
         with:
-          version: '${{ github.event.inputs.version | split(".") | first }}'
+          version: 17.0
 
       - name: Download OpenMP release from LLVM
         run: |
