@@ -85,10 +85,10 @@ jobs:
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
         run: exit 1
 
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v2
+      - name: Setup LLVM
+        uses: ZhongRuoyu/setup-llvm@v0
         with:
-          version: 17.0.6
+          llvm-version: 17
 
       - name: Download OpenMP release from LLVM
         run: |
