@@ -25,6 +25,7 @@ else
     BUILD_HOST=""
     EXTRA_CFLAGS=""
 fi
+
 # libogg
 curl -LO https://downloads.xiph.org/releases/ogg/libogg-$OGGVERSION.tar.gz
 tar zxvf libogg-$OGGVERSION.tar.gz
@@ -34,7 +35,6 @@ make -j$JOBS
 cd ..
 
 # libvorbis
-
 export OGG_CFLAGS="-I$OGG_INCDIR"
 export OGG_LIBS="-L$OGG_LIBDIR -logg"
 
@@ -45,6 +45,7 @@ sed -e 's/ -force_cpusubtype_ALL / /' -i.orig configure
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --disable-shared --with-ogg-includes=$OGG_INCDIR --with-ogg-libraries=$OGG_LIBDIR
 make -j$JOBS
 cd ..
+
 # libFLAC
 curl -LO https://downloads.xiph.org/releases/flac/flac-$FLACVERSION.tar.xz
 unxz flac-$FLACVERSION.tar.xz
@@ -53,6 +54,7 @@ cd flac-$FLACVERSION
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared --with-ogg-includes=$OGG_INCDIR --with-ogg-libraries=$OGG_LIBDIR
 make -j$JOBS
 cd ..
+
 # libopus
 curl -LO https://downloads.xiph.org/releases/opus/opus-$OPUSVERSION.tar.gz
 tar zxvf opus-$OPUSVERSION.tar.gz
@@ -61,6 +63,7 @@ ln -sf include opus
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --disable-shared --enable-static
 make -j$JOBS
 cd ..
+
 # mpg123
 curl -LO https://sourceforge.net/projects/mpg123/files/mpg123/$MPG123VERSION/mpg123-$MPG123VERSION.tar.bz2
 tar zxvf mpg123-$MPG123VERSION.tar.bz2
@@ -68,6 +71,7 @@ cd mpg123-$MPG123VERSION
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared
 make -j$JOBS
 cd ..
+
 # liblame
 curl -LO https://sourceforge.net/projects/lame/files/lame/$LAMEVERSION/lame-$LAMEVERSION.tar.gz
 tar zxvf lame-$LAMEVERSION.tar.gz
@@ -76,6 +80,7 @@ ln -sf include lame
 CFLAGS=$EXTRA_CFLAGS CXXFLAGS=$EXTRA_CFLAGS ./configure $BUILD_HOST --enable-static --disable-shared
 make -j$JOBS
 cd ..
+
 # libsndfile
 export FLAC_INCLUDE="$(pwd)/flac-$FLACVERSION/include"
 export FLAC_LIBS="$(pwd)/flac-$FLACVERSION/src/libFLAC/.libs/libFLAC.a"
@@ -91,20 +96,24 @@ export MP3LAME_INCLUDE="$(pwd)/lame-$LAMEVERSION"
 export MP3LAME_LIBS="$(pwd)/lame-$LAMEVERSION/libmp3lame/.libs/libmp3lame.a"
 export MPG123_INCLUDE="$(pwd)/mpg123-$MPG123VERSION/src/libmpg123"
 export MPG123_LIBS="$(pwd)/mpg123-$MPG123VERSION/src/libmpg123/.libs/libmpg123.a"
+
 curl -LO https://github.com/libsndfile/libsndfile/releases/download/$SNDFILE_VERSION/libsndfile-$SNDFILE_VERSION.tar.xz
 tar jxvf libsndfile-$SNDFILE_VERSION.tar.xz
 cd $SNDFILENAME
+
 if [ "$1" = "arm64" ]; then
 cmake -DCMAKE_OSX_ARCHITECTURES=arm64 -DBUILD_SHARED_LIBS=ON -DENABLE_EXTERNAL_LIBS=ON -DENABLE_MPEG=ON -DBUILD_PROGRAMS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_PROJECT_INCLUDE=../darwin.cmake .
 else
 cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DBUILD_SHARED_LIBS=ON -DENABLE_EXTERNAL_LIBS=ON -DENABLE_MPEG=ON -DBUILD_PROGRAMS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_PROJECT_INCLUDE=../darwin.cmake .
 fi
+
 cmake --build . --parallel $JOBS
 cd ..
+
 if [ "$1" = "arm64" ]; then
 cp -H $SNDFILENAME/libsndfile.dylib libsndfile_arm64.dylib
 chmod -x libsndfile_arm64.dylib
 else
-cp -H $SNDFILENAME/libsndfile.dylib libsndfile.dylib
-chmod -x libsndfile.dylib
+cp -H $SNDFILENAME/libsndfile.dylib libsndfile_x86_64.dylib
+chmod -x libsndfile_x86_64.dylib
 fi

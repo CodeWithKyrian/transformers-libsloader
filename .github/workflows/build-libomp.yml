@@ -1,0 +1,109 @@
+name: Build OpenMP
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'LLVM Release to Build from'
+        required: true
+        default: '18.1.8'
+      platform:
+        description: 'Platform to Build On'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - linux
+          - windows
+          - macos
+          - all
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          #          - platform: linux
+          #            os: ubuntu-latest
+          #            cc: gcc
+          #            cxx: g++
+          #            cmake-generator: 'Ninja'
+          #            cmake-options: >-
+          #              -DCMAKE_BUILD_TYPE=Release
+          #              -DBUILD_SHARED_LIBS=ON
+          #              -DCMAKE_C_FLAGS="-Wall -Wextra"
+          #              -DCMAKE_VERBOSE_MAKEFILE=ON
+          #          - platform: windows
+          #            os: windows-latest
+          #            cmake-generator: 'Visual Studio 17 2022'
+          #            cmake-options: >-
+          #              -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
+          #              -DBUILD_SHARED_LIBS=ON
+          #              -DBUILD_REGTEST=OFF
+          #              -DBUILD_EXAMPLES=OFF
+          #              -DINSTALL_PKGCONFIG_MODULE=OFF
+          #              -DCMAKE_BUILD_TYPE=Release
+          #              -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          #              -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
+          - name: macos-arm64
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            cmake-generator: 'Unix Makefiles'
+            cmake-options: >-
+              -DLIBOMP_ARCH=aarch64
+              -DLIBOMP_ENABLE_SHARED=ON
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+          - name: macos-x86_64
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            cmake-generator: 'Unix Makefiles'
+            cmake-options: >-
+              -DLIBOMP_ARCH=x86_64
+              -DLIBOMP_ENABLE_SHARED=ON
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+      fail-fast: false
+      max-parallel: 3
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check if platform matches
+        if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
+        run: exit 1
+
+      - name: Download OpenMP release from LLVM
+        run: |
+          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ github.event.inputs.version }}/openmp-${{ github.event.inputs.version }}.src.tar.xz
+          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ github.event.inputs.version }}/cmake-${{ github.event.inputs.version }}.src.tar.xz
+
+      - name: Extract tarballs
+        run: |
+          tar -xf openmp-${{ github.event.inputs.version }}.src.tar.xz
+          tar -xf cmake-${{ github.event.inputs.version }}.src.tar.xz
+
+      - name: Rename CMake directory
+        run: |
+          mv cmake-${{ github.event.inputs.version }}.src cmake
+
+      - name: Create build directory
+        run: mkdir build
+
+      - name: Configure the build with CMake
+        run: |
+          cd build
+          cmake ../openmp-${{ github.event.inputs.version }}.src ${{ matrix.cmake-options }} -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_BUILD_TYPE=Release -G "${{ matrix.cmake-generator }}"
+
+      - name: Build the project
+        run: |
+          cd build
+          make -j$(nproc)
+
+      - name: Upload the built library
+        uses: actions/upload-artifact@v3
+        with:
+          name: libomp-${{ github.event.inputs.version }}-${{ matrix.name }}.tar.gz
+          path: build/runtime/src

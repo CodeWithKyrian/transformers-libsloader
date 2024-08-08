@@ -19,7 +19,7 @@ on:
           - all
 
 jobs:
-  macos-intel:
+  macos-x86_64:
     runs-on: macos-13
     if: ${{ inputs.platform == 'macos' || inputs.platform == 'all' }}
 
@@ -32,8 +32,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: libsndfile-x86_64.dylib
-          path: "libsndfile.dylib"
+          name: libsndfile_x86_64.dylib
+          path: "libsndfile_x86_64.dylib"
           retention-days: 7
           if-no-files-found: error
 
@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: libsndfile-arm64.dylib
+          name: libsndfile_arm64.dylib
           path: "libsndfile_arm64.dylib"
           retention-days: 7
           if-no-files-found: error
