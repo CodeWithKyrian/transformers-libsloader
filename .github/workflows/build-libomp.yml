@@ -85,11 +85,6 @@ jobs:
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
         run: exit 1
 
-      - name: Setup LLVM
-        uses: ZhongRuoyu/setup-llvm@v0
-        with:
-          llvm-version: '18'
-
       - name: Install Dependencies (Linux)
         if: matrix.platform == 'linux'
         run: |
