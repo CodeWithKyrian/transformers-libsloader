@@ -19,137 +19,168 @@ on:
           - all
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - name: linux-serial-x86_64
-            platform: linux
-            os: ubuntu-latest
-            openmp: 0
-            target: HASWELL
-          - name: linux-serial-armv8
-            platform: linux
-            os: ubuntu-latest
-            openmp: 0
-            target: CORTEXA53
-          - name: linux-openmp-x86_64
-            platform: linux
-            os: ubuntu-latest
-            openmp: 1
-            target: HASWELL
-          - name: linux-openmp-armv8
-            platform: linux
-            os: ubuntu-latest
-            openmp: 1
-            target: CORTEXA53
-          - name: macos-serial-arm64
-            platform: macos
-            os: macos-latest
-            openmp: 0
-            target: VORTEX
-          - name: macos-serial-x86_64
-            platform: macos
-            os: macos-latest
-            openmp: 0
-            target: NEHALEM
-          - name: macos-openmp-arm64
-            platform: macos
-            os: macos-latest
-            openmp: 1
-            target: VORTEX
-          - name: macos-openmp-x86_64
-            platform: macos
-            os: macos-latest
-            openmp: 1
-            target: NEHALEM
-          - name: windows-serial-x86_64
-            platform: windows
-            os: windows-latest
-            openmp: 0
-            target: DYNAMIC
-          - name: windows-openmp-x86_64
-            platform: windows
-            os: windows-latest
-            openmp: 1
-            target: DYNAMIC
-      fail-fast: false
+#  build:
+#    strategy:
+#      matrix:
+#        include:
+#          - name: linux-serial-x86_64
+#            platform: linux
+#            os: ubuntu-latest
+#            openmp: 0
+#            target: HASWELL
+##          - name: linux-serial-armv8
+##            platform: linux
+##            os: ubuntu-latest
+##            openmp: 0
+##            target: ARMV8
+#          - name: linux-openmp-x86_64
+#            platform: linux
+#            os: ubuntu-latest
+#            openmp: 1
+#            target: HASWELL
+##          - name: linux-openmp-armv8
+##            platform: linux
+##            os: ubuntu-latest
+##            openmp: 1
+##            target: ARMV8
+#          - name: macos-serial-arm64
+#            platform: macos
+#            os: macos-latest
+#            openmp: 0
+#            target: VORTEX
+#          - name: macos-serial-x86_64
+#            platform: macos
+#            os: macos-latest
+#            openmp: 0
+#            target: NEHALEM
+#          - name: macos-openmp-arm64
+#            platform: macos
+#            os: macos-latest
+#            openmp: 1
+#            target: VORTEX
+#          - name: macos-openmp-x86_64
+#            platform: macos
+#            os: macos-latest
+#            openmp: 1
+#            target: NEHALEM
+#          - name: windows-serial-x86_64
+#            platform: windows
+#            os: windows-latest
+#            openmp: 0
+#            target: DYNAMIC
+#          - name: windows-openmp-x86_64
+#            platform: windows
+#            os: windows-latest
+#            openmp: 1
+#            target: DYNAMIC
+#      fail-fast: false
+#
+#    runs-on: ${{ matrix.os }}
+#
+#    steps:
+#      - name: Check if platform matches
+#        if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
+#        run: exit 1
+#
+#      - name: Checkout Repository
+#        uses: actions/checkout@v4
+#        with:
+#          repository: OpenMathLib/OpenBLAS
+#          ref: ${{ github.event.inputs.version }}
+#
+#      - name: Install Dependencies (Linux)
+#        if: matrix.platform == 'linux'
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y gcc gfortran libopenblas-dev liblapack-dev cmake
+#
+#      - name: Install Dependencies (macOS)
+#        if: matrix.platform == 'macos'
+#        run: |
+#          brew reinstall gcc
+#          brew install coreutils cmake ccache llvm
+#
+#      - name: Install Dependencies (Windows)
+#        if: matrix.platform == 'windows'
+#        uses: msys2/setup-msys2@v2
+#        with:
+#          msystem: UCRT64
+#          update: true
+#          release: false
+#          install: >-
+#            base-devel
+#            mingw-w64-ucrt-x86_64-cc
+#            mingw-w64-ucrt-x86_64-fc
+#            mingw-w64-ucrt-x86_64-cmake
+#            mingw-w64-ucrt-x86_64-ninja
+#            mingw-w64-ucrt-x86_64-ccache
+#
+#      - name: Build OpenBLAS (Linux)
+#        if: matrix.platform == 'linux'
+#        run: |
+#          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
+#          make PREFIX=$PWD/openblas-${{ matrix.name }} install
+#
+#      - name: Build OpenBLAS (macOS)
+#        if: matrix.platform == 'macos'
+#        run: |
+#          export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+#          export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+#          export CC="/opt/homebrew/opt/llvm/bin/clang"
+#          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
+#          make PREFIX=$PWD/openblas-${{ matrix.name }} install
+#
+#      - name: Build OpenBLAS (Windows)
+#        if: matrix.platform == 'windows'
+#        run: |
+#          mkdir build && cd build
+#          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DDYNAMIC_ARCH=ON -DUSE_OPENMP=${{ matrix.openmp }} -DUSE_THREAD=ON -DNUM_THREADS=64 -DTARGET=CORE2 -DONLY_CBLAS=1 ..
+#          cmake --build .
+#          cmake --install . --config Release --prefix install
+#
+#      - name: Compress to Tarball (Linux and macOS)
+#        if: matrix.platform != 'windows'
+#        run: |
+#          tar -czvf openblas-${{ matrix.name }}.tar.gz openblas-${{ matrix.name }}
+#
+#      - name: Compress to Tarball (Windows)
+#        if: matrix.platform == 'windows'
+#        run: |
+#          tar -czvf openblas-${{ matrix.name }}.tar.gz build/install
+#
+#      - name: Upload OpenBLAS
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: openblas-${{ github.event.inputs.version }}-${{ matrix.name }}
+#          path: ${{ github.workspace }}/*.tar.gz
 
-    runs-on: ${{ matrix.os }}
-
+  build-linux-arm64:
+    if: github.event.inputs.platform == 'linux' || github.event.inputs.platform == 'all'
+    runs-on: ubuntu-latest
     steps:
-      - name: Check if platform matches
-        if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
-        run: exit 1
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           repository: OpenMathLib/OpenBLAS
           ref: ${{ github.event.inputs.version }}
 
-      - name: Install Dependencies (Linux)
-        if: matrix.platform == 'linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc gfortran libopenblas-dev liblapack-dev cmake
-
-      - name: Install Dependencies (macOS)
-        if: matrix.platform == 'macos'
-        run: |
-          brew reinstall gcc
-          brew install coreutils cmake ccache llvm
-
-      - name: Install Dependencies (Windows)
-        if: matrix.platform == 'windows'
-        uses: msys2/setup-msys2@v2
+      - name: Build OpenBLAS
+        uses: pguyot/arm-runner-action@v2
         with:
-          msystem: UCRT64
-          update: true
-          release: false
-          install: >-
-            base-devel
-            mingw-w64-ucrt-x86_64-cc
-            mingw-w64-ucrt-x86_64-fc
-            mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-ninja
-            mingw-w64-ucrt-x86_64-ccache
-
-      - name: Build OpenBLAS (Linux)
-        if: matrix.platform == 'linux'
-        run: |
-          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=64 ONLY_CBLAS=1 libs shared
-          make PREFIX=$PWD/openblas-${{ matrix.name }} install
-
-      - name: Build OpenBLAS (macOS)
-        if: matrix.platform == 'macos'
-        run: |
-          export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
-          export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
-          export CC="/opt/homebrew/opt/llvm/bin/clang"
-          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=${{ matrix.openmp }} TARGET=${{ matrix.target }} NUM_THREADS=56 FC="ccache" ONLY_CBLAS=1 libs shared
-          make PREFIX=$PWD/openblas-${{ matrix.name }} install
-
-      - name: Build OpenBLAS (Windows)
-        if: matrix.platform == 'windows'
-        run: |
-          mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DDYNAMIC_ARCH=ON -DUSE_OPENMP=${{ matrix.openmp }} -DUSE_THREAD=ON -DNUM_THREADS=64 -DTARGET=CORE2 -DONLY_CBLAS=1 ..
-          cmake --build .
-          cmake --install . --config Release --prefix install
-
-      - name: Compress to Tarball (Linux and macOS)
-        if: matrix.platform != 'windows'
-        run: |
-          tar -czvf openblas-${{ matrix.name }}.tar.gz openblas-${{ matrix.name }}
-
-      - name: Compress to Tarball (Windows)
-        if: matrix.platform == 'windows'
-        run: |
-          tar -czvf openblas-${{ matrix.name }}.tar.gz build/install
+          base_image: raspios_lite_arm64:2023-05-03
+          cpu: cortex-a53
+          cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+          bind_mount_repository: true
+          commands: |
+            sudo apt-get update -y
+            sudo apt-get install -y gcc gfortran libopenblas-dev liblapack-dev cmake
+            make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=1 TARGET=ARMV8 NUM_THREADS=64 ONLY_CBLAS=1 libs shared
+            make PREFIX=$PWD/openblas install
+            
+            tar -czvf openblas.tar.gz openblas
 
       - name: Upload OpenBLAS
         uses: actions/upload-artifact@v4
         with:
-          name: openblas-${{ github.event.inputs.version }}-${{ matrix.name }}
-          path: ${{ github.workspace }}/*.tar.gz
+          name: openblas-${{ github.event.inputs.version }}-linux-arm64
+          path: /*.tar.gz
