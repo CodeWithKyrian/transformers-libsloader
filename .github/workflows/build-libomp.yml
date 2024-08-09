@@ -27,7 +27,7 @@ jobs:
             platform: linux
             os: ubuntu-latest
             cc: clang-18
-            cxx: clang-18++
+            cxx: clang++-18
             cmake-generator: 'Unix Makefiles'
             cmake-options: >-
               -DLIBOMP_ARCH=aarch64
@@ -36,8 +36,8 @@ jobs:
           - name: linux-x86_64
             platform: linux
             os: ubuntu-latest
-            cc: gcc
-            cxx: g++
+            cc: clang-18
+            cxx: clang++-18
             cmake-generator: 'Unix Makefiles'
             cmake-options: >-
               -DLIBOMP_ARCH=x86_64
