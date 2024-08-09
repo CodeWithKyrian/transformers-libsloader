@@ -106,7 +106,7 @@ jobs:
 
       - name: Extract tarballs
         run: |
-          tar -xf openmp-${{ github.event.inputs.version }}.src.tar.xz
+          tar -xf open cdmp-${{ github.event.inputs.version }}.src.tar.xz
           tar -xf cmake-${{ github.event.inputs.version }}.src.tar.xz
 
       - name: Rename CMake directory
