@@ -96,7 +96,7 @@ jobs:
               bind_mount_repository: true
               commands: |
                 sudo apt-get update -y
-                sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
+                sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev cmake
                 
                 cmake -E make_directory ${{runner.workspace}}/build
                 cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
