@@ -94,17 +94,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get update -y && sudo apt install curl && sudo apt-get install libcurl4-openssl-dev
-
-      - name: Download OpenMP release from LLVM
-        run: |
-          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ github.event.inputs.version }}/openmp-${{ github.event.inputs.version }}.src.tar.xz
-          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ github.event.inputs.version }}/cmake-${{ github.event.inputs.version }}.src.tar.xz
-
-      - name: Extract tarballs
-        run: |
-          tar -xf openmp-${{ github.event.inputs.version }}.src.tar.xz
-          tar -xf cmake-${{ github.event.inputs.version }}.src.tar.xz
+          sudo apt-get update -y && sudo apt install llvm-18-dev clang-18 libomp-dev
 
       - name: Rename CMake directory
         run: |
