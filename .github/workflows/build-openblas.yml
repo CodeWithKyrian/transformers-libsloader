@@ -32,7 +32,7 @@ jobs:
             platform: linux
             os: ubuntu-latest
             openmp: 0
-            target: ARMV8
+            target: CORTEXA53
           - name: linux-openmp-x86_64
             platform: linux
             os: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
             platform: linux
             os: ubuntu-latest
             openmp: 1
-            target: ARMV8
+            target: CORTEXA53
           - name: macos-serial-arm64
             platform: macos
             os: macos-latest
