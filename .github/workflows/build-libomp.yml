@@ -94,6 +94,7 @@ jobs:
           sudo apt-get install libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime
           sudo apt-get install clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-18 100
           
 
       - name: Download OpenMP release from LLVM
