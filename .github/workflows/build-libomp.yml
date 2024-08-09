@@ -85,17 +85,23 @@ jobs:
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
         run: exit 1
 
-      - name: Install Dependencies (Linux)
-        if: matrix.platform == 'linux'
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"
-          sudo apt-get update
-          sudo apt-get install libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime
-          sudo apt-get install clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
-          update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-18 100
-          
+#      - name: Install Dependencies (Linux)
+#        if: matrix.platform == 'linux'
+#        run: |
+#          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+#          sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"
+#          sudo apt-get update
+#          sudo apt-get install libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime
+#          sudo apt-get install clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18
+#          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+#          update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-18 100
+
+      - name: Set up Clang (Linux)
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
+
 
       - name: Download OpenMP release from LLVM
         run: |
