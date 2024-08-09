@@ -94,13 +94,13 @@ jobs:
               cpu: cortex-a53
               cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
               bind_mount_repository: true
-            commands: |
-              sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
-              
-              cmake -E make_directory ${{runner.workspace}}/build
-              cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
-              cmake --build . --config Release
-              cpack -C Release -G TGZ
+              commands: |
+                sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
+                
+                cmake -E make_directory ${{runner.workspace}}/build
+                cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+                cmake --build . --config Release
+                cpack -C Release -G TGZ
 
           - name: Upload Artifact
             uses: actions/upload-artifact@v4
