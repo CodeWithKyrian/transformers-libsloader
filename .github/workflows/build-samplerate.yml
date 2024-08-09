@@ -84,7 +84,7 @@ jobs:
           - name: Checkout Repository
             uses: actions/checkout@v4
             with:
-              repository: OpenMathLib/OpenBLAS
+              repository: libsndfile/libsamplerate
               ref: ${{ github.event.inputs.version }}
 
           - name: Build Samplerate
