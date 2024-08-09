@@ -26,8 +26,8 @@ jobs:
           - name: linux-arm64
             platform: linux
             os: ubuntu-latest
-            cc: gcc
-            cxx: g++
+            cc: clang
+            cxx: clang++
             cmake-generator: 'Unix Makefiles'
             cmake-options: >-
               -DLIBOMP_ARCH=aarch64
@@ -36,8 +36,8 @@ jobs:
           - name: linux-x86_64
             platform: linux
             os: ubuntu-latest
-            cc: clang
-            cxx: clang++
+            cc: gcc
+            cxx: g++
             cmake-generator: 'Unix Makefiles'
             cmake-options: >-
               -DLIBOMP_ARCH=x86_64
@@ -85,27 +85,16 @@ jobs:
         if: github.event.inputs.platform != 'all' && github.event.inputs.platform != matrix.platform
         run: exit 1
 
-      - name: Install LLVM and Clang
+      - name: Setup LLVM
+        uses: ZhongRuoyu/setup-llvm@v0
+        with:
+          llvm-version: '18'
+
+      - name: Install Dependencies (Linux)
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl
-          
-          # Get the major version of the release
-          export MAJOR_VERSION=$(echo ${{ github.event.inputs.version }} | cut -d '.' -f 1)
-          
-          # Install LLVM and Clang
-          curl -SL https://apt.llvm.org/llvm.sh | sudo bash -s -- ${{ env.MAJOR_VERSION }}
-          
-          # Optionally, set the newly installed LLVM and Clang as the default
-          sudo update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-${{ env.MAJOR_VERSION }}/bin/clang 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-${{ env.MAJOR_VERSION }}/bin/clang++ 100
-
-#      - name: Install Dependencies (Linux)
-#        if: matrix.platform == 'linux'
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get update -y && sudo apt install curl && sudo apt-get install libcurl4-openssl-dev
+          sudo apt-get update -y && sudo apt install curl && sudo apt-get install libcurl4-openssl-dev
 
       - name: Download OpenMP release from LLVM
         run: |
