@@ -98,8 +98,9 @@ jobs:
                 sudo apt-get update -y
                 sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev cmake
                 
-                cmake -E make_directory ${{runner.workspace}}/build
-                cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+                mkdir build
+                cd build
+                cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
                 cmake --build . --config Release
                 cpack -C Release -G TGZ
 
@@ -107,4 +108,4 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: libsamplerate-${{ github.event.inputs.version }}-linux-arm64
-              path: ${{ runner.workspace }}/build/*.tar.gz
+              path: build/*.tar.gz
