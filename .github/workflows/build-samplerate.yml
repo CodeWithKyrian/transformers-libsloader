@@ -75,3 +75,35 @@ jobs:
               with:
                   name: libsamplerate-${{ github.event.inputs.version }}-${{ matrix.platform }}
                   path: ${{ runner.workspace }}/build/*.tar.gz
+
+    build-linux-arm64:
+        name: Build Linux ARM64
+        if: github.event.inputs.platform == 'linux'
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+            with:
+              repository: OpenMathLib/OpenBLAS
+              ref: ${{ github.event.inputs.version }}
+
+          - name: Build Samplerate
+            uses: pguyot/arm-runner-action@v2
+            with:
+              base_image: raspios_lite_arm64:2022-04-04
+              cpu: cortex-a53
+              cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+              bind_mount_repository: true
+            commands: |
+              sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev
+              
+              cmake -E make_directory ${{runner.workspace}}/build
+              cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+              cmake --build . --config Release
+              cpack -C Release -G TGZ
+
+          - name: Upload Artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: libsamplerate-${{ github.event.inputs.version }}-linux-arm64
+              path: ${{ runner.workspace }}/build/*.tar.gz
