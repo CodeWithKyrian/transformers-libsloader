@@ -78,7 +78,7 @@ jobs:
 
     build-linux-arm64:
         name: Build Linux ARM64
-        if: github.event.inputs.platform == 'linux'
+        if: github.event.inputs.platform == 'linux' || github.event.inputs.platform == 'all'
         runs-on: ubuntu-latest
         steps:
           - name: Checkout Repository
