@@ -59,3 +59,36 @@ jobs:
         with:
           name: fast_transformers_utils-${{ github.event.inputs.version }}-${{ matrix.platform }}
           path: ${{ runner.workspace }}/build/*.tar.gz
+
+  build-linux-arm64:
+    if: github.event.inputs.platform == 'linux' || github.event.inputs.platform == 'all'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: CodeWithKyrian/fast_transformers_utils
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Build Fast Transformers Utils
+        uses: pguyot/arm-runner-action@v2
+        with:
+          base_image: raspios_lite_arm64:2023-05-03
+          cpu: cortex-a53
+          cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+          bind_mount_repository: true
+          commands: |
+            sudo apt-get update -y
+            sudo apt-get install -y libsndfile-dev libopus-dev libfftw3-dev libasound2-dev cmake
+            
+            mkdir build
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --config Release
+            cpack -C Release -G TGZ
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast_transformers_utils-${{ github.event.inputs.version }}-linux-arm64
+          path: build/*.tar.gz
