@@ -183,4 +183,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: openblas-${{ github.event.inputs.version }}-linux-arm64
-          path: /*.tar.gz
+          path: openblas.tar.gz
