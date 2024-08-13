@@ -100,7 +100,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $downloadUrl = "$baseUrl/$downloadFile";
         $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php').".$extension";
 
-        $this->io->write("  - Downloading <info>$downloadFile</info>");
+        $this->io->write("  - Downloading <info>transformersphp-$version-$os-$arch</info>");
         $this->downloader->copy($downloadUrl, $downloadPath);
         $this->io->write("  - Installing <info>$downloadFile</info> : Extracting archive");
 
