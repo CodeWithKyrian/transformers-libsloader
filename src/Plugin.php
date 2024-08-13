@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Codewithkyrian\TransformersLibrariesDownloader;
 
 use Composer\Composer;
+use Composer\Downloader\TransportException;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
@@ -110,7 +111,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             try {
                 $response = $this->downloader->copy($downloadUrl, $downloadPath);
                 $downloadSuccess = $response->getStatusCode() === 200;
-            } catch (\Exception) {
+            } catch (TransportException) {
             }
 
             if ($downloadSuccess) {
