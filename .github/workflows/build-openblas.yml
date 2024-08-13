@@ -154,6 +154,29 @@ jobs:
 #          name: openblas-${{ github.event.inputs.version }}-${{ matrix.name }}
 #          path: ${{ github.workspace }}/*.tar.gz
 
+  build-linux-x86_64:
+    if: github.event.inputs.platform == 'linux' || github.event.inputs.platform == 'all'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: OpenMathLib/OpenBLAS
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Build OpenBLAS
+        run: |
+          make -j$(nproc) DYNAMIC_ARCH=1 USE_OPENMP=1 TARGET=HASWELL NUM_THREADS=64 ONLY_CBLAS=1 libs shared
+          make PREFIX=$PWD/openblas install
+          
+          tar -czvf openblas.tar.gz openblas
+
+      - name: Upload OpenBLAS
+        uses: actions/upload-artifact@v4
+        with:
+          name: openblas-${{ github.event.inputs.version }}-x86_64
+          path: ${{ github.workspace }}/openblas.tar.gz
+
   build-linux-arm64:
     if: github.event.inputs.platform == 'linux' || github.event.inputs.platform == 'all'
     runs-on: ubuntu-latest
