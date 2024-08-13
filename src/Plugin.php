@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Codewithkyrian\TransformersLibrariesDownloader;
 
 use Composer\Composer;
@@ -10,6 +9,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Util\HttpDownloader;
 use Exception;
@@ -18,9 +18,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 {
     protected Composer $composer;
     protected IOInterface $io;
+    protected ?PackageInterface $package;
     protected HttpDownloader $downloader;
-
-    protected string $libsDir;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -40,26 +39,31 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     public function checkSharedLibraries(PackageEvent $event): void
     {
-        $package = match ($event->getOperation()->getOperationType()) {
+        $this->package = match ($event->getOperation()->getOperationType()) {
             'install' => $event->getOperation()->getPackage(),
             'update' => $event->getOperation()->getTargetPackage(),
             default => null,
         };
 
-        if ($package?->getName() !== 'codewithkyrian/transformers') {
+        if ($this->package?->getName() !== 'codewithkyrian/transformers') {
             return;
         }
 
         try {
             $installationManager = $event->getComposer()->getInstallationManager();
-            $this->libsDir = $installationManager->getInstallPath($package) . '/libs';
-            $this->io->write("<info>Checking TransformersPHP libraries...</info>");
-            foreach (Libraries::cases() as $library) {
-                if (!$library->exists($this->libsDir)) {
-                    $name = $library->folder($this->libsDir);
+            $libsDir = $installationManager->getInstallPath($this->package).DIRECTORY_SEPARATOR.'libs';
 
-                    $this->downloadAndExtract($name);
+            $installationNeeded = false;
+            foreach (Library::cases() as $library) {
+                if (!$library->exists($libsDir)) {
+                    $installationNeeded = true;
+                    break;
                 }
+            }
+
+            if ($installationNeeded) {
+                $this->io->write("<info>Installing TransformersPHP libraries...</info>");
+                $this->install($libsDir);
             }
         } catch (Exception $e) {
             $this->io->writeError($e->getMessage());
@@ -67,40 +71,47 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
     }
 
-    /**
-     * @param string $name
-     * @return void
-     */
-    public function downloadAndExtract(string $name): void
+
+    public function install(string $libsDir): void
     {
-        $baseUrl = Libraries::baseUrl($this->libsDir);
-        $ext = Libraries::ext();
+        $version = $this->package->getVersion();
 
-        $downloadUrl = "$baseUrl/$name.$ext";
-        $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php') . ".$ext";
+        $os = match (PHP_OS_FAMILY) {
+            'Windows' => 'windows',
+            'Darwin' => 'macosx',
+            default => 'linux',
+        };
 
-        $this->io->write("  - Downloading <info>$name</info>");
+        $arch = match (PHP_OS_FAMILY) {
+            'Windows' => 'x86_64',
+            'Darwin' => php_uname('m') == 'x86_64' ? 'x86_64' : 'arm64',
+            default => php_uname('m') == 'x86_64' ? 'x86_64' : 'aarch64',
+        };
 
+        $extension = match ($os) {
+            'windows' => 'zip',
+            default => 'tar.gz',
+        };
+
+        $baseUrl = "https://github.com/CodeWithKyrian/transformers-php/releases/download/$version";
+        $downloadFile = "transformersphp-$version-$os-$arch.$extension";
+        $downloadUrl = "$baseUrl/$downloadFile";
+        $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php').".$extension";
+
+        $this->io->write("  - Downloading <info>$downloadFile</info>");
         $this->downloader->copy($downloadUrl, $downloadPath);
-
-        $this->io->write("  - Installing <info>$name</info> : Extracting archive");
+        $this->io->write("  - Installing <info>$downloadFile</info> : Extracting archive");
 
         $archive = new \PharData($downloadPath);
-
-        if ($ext != 'zip') {
+        if ($extension != 'zip') {
             $archive = $archive->decompress();
         }
+        $archive->extractTo($libsDir);
 
-        $archive->extractTo($this->libsDir);
+        $this->io->write("Installation complete. You're ready to use TransformersPHP.");
     }
 
+    public function deactivate(Composer $composer, IOInterface $io) {}
 
-    public function deactivate(Composer $composer, IOInterface $io)
-    {
-    }
-
-    public function uninstall(Composer $composer, IOInterface $io)
-    {
-    }
-
+    public function uninstall(Composer $composer, IOInterface $io) {}
 }
