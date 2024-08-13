@@ -28,7 +28,7 @@ jobs:
             configure-options: ''
           - platform: windows
             os: windows-latest
-            configure-options: -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=True
+            configure-options: -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
           - platform: macos
             os: macos-latest
             configure-options: ''
