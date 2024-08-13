@@ -13,7 +13,6 @@ use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Util\HttpDownloader;
 use Exception;
-use function Codewithkyrian\Transformers\Utils\basePath;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
@@ -74,7 +73,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
 
-    public function install(string $installPath): void
+    private function install(string $installPath): void
     {
         $version = file_get_contents(Library::joinPaths($installPath, 'VERSION'));
 
@@ -95,24 +94,65 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             default => 'tar.gz',
         };
 
-        $baseUrl = "https://github.com/CodeWithKyrian/transformers-php/releases/download/$version";
-        $downloadFile = "transformersphp-$version-$os-$arch.$extension";
-        $downloadUrl = "$baseUrl/$downloadFile";
-        $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php').".$extension";
+        $maxRetries = 10;
+        $attempts = 0;
 
-        $this->io->write("  - Downloading <info>transformersphp-$version-$os-$arch</info>");
-        $this->downloader->copy($downloadUrl, $downloadPath);
-        $this->io->write("  - Installing <info>$downloadFile</info> : Extracting archive");
+        do {
+            $baseUrl = "https://github.com/CodeWithKyrian/transformers-php/releases/download/$version";
+            $downloadFile = "transformersphp-$version-$os-$arch.$extension";
+            $downloadUrl = "$baseUrl/$downloadFile";
+            $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php').".$extension";
 
-        $archive = new \PharData($downloadPath);
-        if ($extension != 'zip') {
-            $archive = $archive->decompress();
+            $this->io->write("  - Downloading <info>transformersphp-$version-$os-$arch</info>");
+
+            $downloadSuccess = false;
+
+            try {
+                $response = $this->downloader->copy($downloadUrl, $downloadPath);
+                $downloadSuccess = $response->getStatusCode() === 200;
+            } catch (\Exception) {
+            }
+
+            if ($downloadSuccess) {
+                $this->io->write("  - Installing <info>trasformersphp-$version-$os-$arch</info> : Extracting archive");
+
+                $archive = new \PharData($downloadPath);
+                if ($extension != 'zip') {
+                    $archive = $archive->decompress();
+                }
+
+                $archive->extractTo(Library::joinPaths($installPath, 'libs'), overwrite: true);
+                @unlink($downloadPath);
+
+                echo "TransformersPHP libraries installed\n";
+                return;
+            } else {
+                echo "  - Failed to download transformersphp-$version-$os-$arch, trying a lower version...\n";
+                $version = self::getLowerVersion($version);
+            }
+
+            $attempts++;
+        } while ($version !== null && $attempts < $maxRetries);
+
+        throw new \Exception("Could not find the required binaries after $maxRetries attempts.");
+    }
+
+    private static function getLowerVersion(string $version): ?string
+    {
+        $parts = explode('.', $version);
+
+        if (count($parts) === 3 && $parts[2] > 0) {
+            $parts[2]--;
+        } elseif (count($parts) === 3) {
+            $parts[1]--;
+            $parts[2] = 9;  // Reset patch version
+        } elseif (count($parts) === 2 && $parts[1] > 0) {
+            $parts[1]--;
+        } else {
+            return null;  // No lower version possible
         }
-        $archive->extractTo(Library::joinPaths($installPath, 'libs'));
 
-        @unlink($downloadPath);
-
-        $this->io->write("Installation complete. You're ready to use TransformersPHP.");
+        return implode('.', $parts);
     }
 
     public function deactivate(Composer $composer, IOInterface $io) {}
