@@ -60,7 +60,7 @@ enum Library
 
         if (!file_exists($libraryFile)) {
             if ($fatal) {
-                throw new RuntimeException('Library file not found: '.$libraryFile);
+                throw new RuntimeException('Library not found: '.$libraryName);
             }
             return null;
         }

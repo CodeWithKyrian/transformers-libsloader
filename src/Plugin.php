@@ -13,6 +13,7 @@ use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Util\HttpDownloader;
 use Exception;
+use function Codewithkyrian\Transformers\Utils\basePath;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
@@ -51,7 +52,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         try {
             $installationManager = $event->getComposer()->getInstallationManager();
-            $libsDir = $installationManager->getInstallPath($this->package).DIRECTORY_SEPARATOR.'libs';
+            $installPath = $installationManager->getInstallPath($this->package);
+            $libsDir = Library::joinPaths($installPath, 'libs');
 
             $installationNeeded = false;
             foreach (Library::cases() as $library) {
@@ -63,7 +65,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
             if ($installationNeeded) {
                 $this->io->write("<info>Installing TransformersPHP libraries...</info>");
-                $this->install($libsDir);
+                $this->install($installPath);
             }
         } catch (Exception $e) {
             $this->io->writeError($e->getMessage());
@@ -72,9 +74,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
 
-    public function install(string $libsDir): void
+    public function install(string $installPath): void
     {
-        $version = $this->package->getVersion();
+        $version = file_get_contents(Library::joinPaths($installPath, 'VERSION'));
 
         $os = match (PHP_OS_FAMILY) {
             'Windows' => 'windows',
@@ -106,7 +108,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         if ($extension != 'zip') {
             $archive = $archive->decompress();
         }
-        $archive->extractTo($libsDir);
+        $archive->extractTo(Library::joinPaths($installPath, 'libs'));
+
+        @unlink($downloadPath);
 
         $this->io->write("Installation complete. You're ready to use TransformersPHP.");
     }
