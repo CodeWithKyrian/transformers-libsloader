@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Codewithkyrian\TransformersLibrariesDownloader;
+namespace Codewithkyrian\TransformersLibsLoader;
 
 use Composer\Composer;
 use Composer\Downloader\TransportException;

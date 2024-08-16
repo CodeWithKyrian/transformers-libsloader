@@ -13,11 +13,11 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Codewithkyrian\\TransformersLibrariesDownloader\\": "src/"
+      "Codewithkyrian\\TransformersLibsLoader\\": "src/"
     }
   },
   "extra": {
-    "class": "Codewithkyrian\\TransformersLibrariesDownloader\\Plugin"
+    "class": "Codewithkyrian\\TransformersLibsLoader\\Plugin"
   },
   "prefer-stable": true,
   "authors": [
