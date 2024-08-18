@@ -122,13 +122,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                     $archive = $archive->decompress();
                 }
 
-                $archive->extractTo(Library::joinPaths($installPath, 'libs'), overwrite: true);
+                $archive->extractTo($installPath, overwrite: true);
                 @unlink($downloadPath);
 
                 echo "TransformersPHP libraries installed\n";
                 return;
             } else {
-                echo "  - Failed to download transformersphp-$version-$os-$arch, trying a lower version...\n";
+                $this->io->write("  - Failed to download <info>transformersphp-$version-$os-$arch</info>, trying a lower version...");
                 $version = self::getLowerVersion($version);
             }
 
