@@ -13,7 +13,7 @@ enum Library
     case RindowMatlib;
     case Sndfile;
     case Samplerate;
-    case FastTransformersUtils;
+    case TransformersPHP;
 
 
     public function header(string $includeDir, bool $fatal = true): ?string
@@ -24,7 +24,7 @@ enum Library
             self::RindowMatlib => 'matlib.h',
             self::Sndfile => 'sndfile.h',
             self::Samplerate => 'samplerate.h',
-            self::FastTransformersUtils => 'fast_transformers_utils.h',
+            self::TransformersPHP => 'transformersphp.h',
         };
 
         $headerFile = $this->joinPaths($includeDir, $filename);
@@ -47,7 +47,7 @@ enum Library
             self::RindowMatlib => 'librindowmatlib',
             self::Sndfile => 'libsndfile',
             self::Samplerate => 'libsamplerate',
-            self::FastTransformersUtils => 'libfast_transformers_utils',
+            self::TransformersPHP => 'libtransformersphp',
         };
 
         $extension = match (PHP_OS_FAMILY) {
