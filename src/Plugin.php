@@ -115,7 +115,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             if ($downloadSuccess) {
-                $this->io->write("  - Installing <info>trasformersphp-$version-$os-$arch</info> : Extracting archive");
+                $this->io->write("  - Installing <info>transformersphp-$version-$os-$arch</info> : Extracting archive");
 
                 $archive = new \PharData($downloadPath);
                 if ($extension != 'zip') {
