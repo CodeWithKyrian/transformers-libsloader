@@ -100,8 +100,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         do {
             $baseUrl = "https://github.com/CodeWithKyrian/transformers-php/releases/download/$version";
-            $downloadFile = "transformersphp-$version-$os-$arch.$extension";
-            $downloadUrl = "$baseUrl/$downloadFile";
+            $filename = "transformersphp-$version-$os-$arch";
+            $downloadUrl = "$baseUrl/$filename.$extension";
             $downloadPath = tempnam(sys_get_temp_dir(), 'transformers-php').".$extension";
 
             $this->io->write("  - Downloading <info>transformersphp-$version-$os-$arch</info>");

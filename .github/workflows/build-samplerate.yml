@@ -29,9 +29,12 @@ jobs:
               - platform: windows
                 os: windows-latest
                 configure-options: -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
-              - platform: macos
+              - platform: macos-arm64
                 os: macos-latest
-                configure-options: ''
+                configure-options: -DCMAKE_OSX_ARCHITECTURES=arm64
+              - platform: macos-x86_64
+                os: macos-13
+                configure-options: -DCMAKE_OSX_ARCHITECTURES=x86_64
           fail-fast: false
           max-parallel: 3
 
